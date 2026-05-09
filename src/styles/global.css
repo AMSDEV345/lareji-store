@@ -1,0 +1,490 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --beige: url('/bg-beige.jpg');
+  --beige-deep: url('/bg-beige.jpg');
+  --beige-dark: #D4C5B0;
+  --green: #1E4B32;
+  --green-mid: #2a6344;
+  --green-light: #3d7a58;
+  --charcoal: #2C2C2C;
+  --muted: #8a8478;
+  --white: #FFFFFF;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'DM Sans', sans-serif;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html { 
+  scroll-behavior: smooth; 
+}
+
+body {
+  font-family: var(--sans);
+  background: url('/bg-beige.jpg') no-repeat fixed;
+  background-size: cover;
+  background-attachment: fixed;
+  color: var(--charcoal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+button { cursor: pointer; font-family: var(--sans); }
+a { text-decoration: none; color: inherit; }
+img { max-width: 100%; display: block; }
+
+/* ============================================
+CSS KEYFRAME ANIMATIONS
+============================================ */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeLeft {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeRight {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes scaleInBounce {
+  0% { opacity: 0; transform: scale(0.8); }
+  60% { opacity: 1; transform: scale(1.06); }
+  80% { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+@keyframes cartBounce {
+  0%,100% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  70% { transform: scale(0.9); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+@keyframes shimmerSlide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes grain {
+  0%,100% { transform: translate(0, 0); }
+  10% { transform: translate(-2%, -3%); }
+  30% { transform: translate(3%, 2%); }
+  50% { transform: translate(-1%, 3%); }
+  70% { transform: translate(2%, -2%); }
+  90% { transform: translate(-3%, 1%); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes floatUp {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes floatSlow {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-8px) rotate(2deg); }
+  66% { transform: translateY(-4px) rotate(-2deg); }
+}
+
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinIn {
+  from { opacity: 0; transform: rotate(-10deg) scale(0.85); }
+  to { opacity: 1; transform: rotate(0deg) scale(1); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-48px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(48px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(48px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes drawLine {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes blink {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+UTILITY ANIMATION CLASSES
+============================================ */
+
+.anim-fade-up { animation: fadeUp 0.7s var(--ease-out) both; }
+.anim-fade-in { animation: fadeIn 0.6s ease both; }
+.anim-fade-left { animation: fadeLeft 0.7s var(--ease-out) both; }
+.anim-fade-right { animation: fadeRight 0.7s var(--ease-out) both; }
+.anim-scale-in { animation: scaleIn 0.6s var(--ease-out) both; }
+.anim-scale-bounce { animation: scaleInBounce 0.7s var(--ease-out) both; }
+.anim-slide-up { animation: slideInUp 0.7s var(--ease-out) both; }
+.anim-slide-left { animation: slideInLeft 0.7s var(--ease-out) both; }
+.anim-slide-right { animation: slideInRight 0.7s var(--ease-out) both; }
+.anim-float { animation: floatUp 4s ease-in-out infinite; }
+.anim-float-slow { animation: floatSlow 6s ease-in-out infinite; }
+.anim-pulse { animation: pulse 2.4s ease infinite; }
+.anim-spin-slow { animation: rotateSlow 12s linear infinite; }
+
+/* Stagger delay helpers */
+.delay-1 { animation-delay: 0.08s; }
+.delay-2 { animation-delay: 0.16s; }
+.delay-3 { animation-delay: 0.24s; }
+.delay-4 { animation-delay: 0.32s; }
+.delay-5 { animation-delay: 0.40s; }
+.delay-6 { animation-delay: 0.48s; }
+.delay-7 { animation-delay: 0.56s; }
+.delay-8 { animation-delay: 0.64s; }
+
+/* ============================================
+SCROLL REVEAL BASE
+============================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  will-change: opacity, transform;
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.85s var(--ease-out), transform 0.85s var(--ease-out);
+}
+
+/* ============================================
+PARALLAX LAYERS
+============================================ */
+
+.parallax-slow { will-change: transform; }
+.parallax-medium { will-change: transform; }
+.parallax-fast { will-change: transform; }
+
+/* ============================================
+GLOBAL SCROLLBAR
+============================================ */
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--beige-deep); }
+::-webkit-scrollbar-thumb { background: var(--green); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--green-mid); }
+
+/* ============================================
+SELECTION COLOR
+============================================ */
+
+::selection {
+  background: var(--green);
+  color: var(--white);
+}
+
+/* ============================================
+FOCUS STYLES
+============================================ */
+
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+
+.counter {
+  font-size: 16px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
+  margin-bottom: 24px;
+}
+
+.counter:hover {
+  border-color: var(--accent-border);
+}
+
+.counter:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.hero {
+  position: relative;
+}
+
+.hero .base,
+.hero .framework,
+.hero .vite {
+  inset-inline: 0;
+  margin: 0 auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.hero .base {
+  width: 170px;
+  position: relative;
+  z-index: 0;
+}
+
+.hero .framework,
+.hero .vite {
+  position: absolute;
+}
+
+.hero .framework {
+  z-index: 1;
+  top: 34px;
+  height: 28px;
+  transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg) scale(1.4);
+}
+
+.hero .vite {
+  z-index: 0;
+  top: 107px;
+  height: 26px;
+  width: auto;
+  transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg) scale(0.8);
+}
+
+#center {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  place-content: center;
+  place-items: center;
+  flex-grow: 1;
+}
+
+@media (max-width: 1024px) {
+  #center {
+    padding: 32px 20px 24px;
+    gap: 18px;
+  }
+}
+
+#next-steps {
+  display: flex;
+  border-top: 1px solid var(--border);
+  text-align: left;
+}
+
+#next-steps > div {
+  flex: 1 1 0;
+  padding: 32px;
+}
+
+@media (max-width: 1024px) {
+  #next-steps > div {
+    padding: 24px 20px;
+  }
+}
+
+#next-steps .icon {
+  margin-bottom: 16px;
+  width: 22px;
+  height: 22px;
+}
+
+@media (max-width: 1024px) {
+  #next-steps {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+#docs {
+  border-right: 1px solid var(--border);
+}
+
+@media (max-width: 1024px) {
+  #docs {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+#next-steps ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+  margin: 32px 0 0;
+}
+
+#next-steps ul .logo {
+  height: 18px;
+}
+
+#next-steps ul a {
+  color: var(--text-h);
+  font-size: 16px;
+  border-radius: 6px;
+  background: var(--social-bg);
+  display: flex;
+  padding: 6px 12px;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: box-shadow 0.3s;
+}
+
+#next-steps ul a:hover {
+  box-shadow: var(--shadow);
+}
+
+#next-steps ul a .button-icon {
+  height: 18px;
+  width: 18px;
+}
+
+@media (max-width: 1024px) {
+  #next-steps ul {
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  #next-steps ul li {
+    flex: 1 1 calc(50% - 8px);
+  }
+
+  #next-steps ul a {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+}
+
+#spacer {
+  height: 88px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 1024px) {
+  #spacer {
+    height: 48px;
+  }
+}
+
+.ticks {
+  position: relative;
+  width: 100%;
+}
+
+.ticks::before,
+.ticks::after {
+  content: '';
+  position: absolute;
+  top: -4.5px;
+  border: 5px solid transparent;
+}
+
+.ticks::before {
+  left: 0;
+  border-left-color: var(--border);
+}
+
+.ticks::after {
+  right: 0;
+  border-right-color: var(--border);
+}
+
+.nav__logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 8px;
+  color: var(--green);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  user-select: none;
+}
+
+.nav__logo:hover {
+  opacity: 0.7;
+}
+
+.nav__logo-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* Remove white backgrounds from page sections */
+main,
+.page-container,
+.track-section,
+.contact-section,
+.about-section,
+.shop-section {
+  background-color: transparent !important;
+}
