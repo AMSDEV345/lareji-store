@@ -52,12 +52,16 @@ export default function Shop({ navigate }) {
         .shop__hero-title em { font-style: italic; color: rgba(255,255,255,0.62); }
         .shop__hero-count { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 10px; font-weight: 300; }
         .shop__bar {
-          background: transparent;
-background-size: cover;
-background-attachment: fixed;-deep); padding: 18px clamp(20px,6vw,80px);
-          display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+          background: var(--white);
+          padding: 18px clamp(20px,6vw,80px);
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          flex-wrap: wrap;
           border-bottom: 1px solid var(--beige-dark);
-          position: sticky; top: 72px; z-index: 50;
+          position: sticky;
+          top: 72px;
+          z-index: 50;
         }
         .shop__search {
           flex: 1; min-width: 180px; padding: 10px 16px;
@@ -73,10 +77,14 @@ background-attachment: fixed;-deep); padding: 18px clamp(20px,6vw,80px);
         .shop__count { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-left: auto; }
         .shop__body  { display: grid; grid-template-columns: 220px 1fr; min-height: 70vh; }
         .shop__side  {
-          background: var(--white); padding: 32px 24px;
-          border-right: 1px solid var(--beige-deep);
-          position: sticky; top: 125px; align-self: start;
-          max-height: calc(100vh - 125px); overflow-y: auto;
+          background: var(--white);
+          padding: 32px 24px;
+          border-right: 1px solid var(--beige-dark);
+          position: sticky;
+          top: 125px;
+          align-self: start;
+          max-height: calc(100vh - 125px);
+          overflow-y: auto;
         }
         .shop__side-head { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
         .shop__cat-list  { display: flex; flex-direction: column; gap: 2px; }
@@ -86,13 +94,9 @@ background-attachment: fixed;-deep); padding: 18px clamp(20px,6vw,80px);
           font-family: var(--sans); font-size: 13px; color: var(--charcoal);
           text-align: left; transition: background 0.15s; border-radius: 2px;
         }
-        .shop__cat:hover { background: transparent;
-background-size: cover;
-background-attachment: fixed;-deep); }
+        .shop__cat:hover { background: rgba(30,75,50,0.04); }
         .shop__cat.active { background: rgba(30,75,50,0.08); color: var(--green); font-weight: 500; }
-        .shop__cat-badge { font-size: 10px; color: var(--muted); background: transparent;
-background-size: cover;
-background-attachment: fixed;-deep); padding: 2px 7px; border-radius: 10px; }
+        .shop__cat-badge { font-size: 10px; color: var(--muted); background: transparent; padding: 2px 7px; border-radius: 10px; }
         .shop__cat.active .shop__cat-badge { background: rgba(30,75,50,0.14); color: var(--green); }
         .shop__main   { padding: 32px clamp(16px,3vw,40px) 72px; }
         .shop__grid   { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
@@ -112,12 +116,12 @@ background-attachment: fixed;-deep); padding: 2px 7px; border-radius: 10px; }
           background: var(--white); cursor: pointer; overflow: hidden;
           transition: box-shadow 0.3s, transform 0.3s;
           animation: fadeUp 0.55s var(--ease-out) both;
+          border: 1px solid var(--beige-dark);
+          border-radius: 4px;
         }
         .spc:hover { box-shadow: 0 10px 40px rgba(0,0,0,0.09); transform: translateY(-3px); }
         .spc__img {
-          width: 100%; aspect-ratio: 1; background: transparent;
-background-size: cover;
-background-attachment: fixed;-deep);
+          width: 100%; aspect-ratio: 1; background: var(--white);
           display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
         }
         .spc__emoji { font-size: 56px; transition: transform 0.4s var(--ease-out); }
@@ -147,7 +151,7 @@ background-attachment: fixed;-deep);
         }
         .spc__add:hover { background: var(--green-mid); }
         .spc__add.done  { background: #2d7a50; }
-        @media (max-width: 900px) {
+        @media (max-width: 1024px) {
           .shop__body { grid-template-columns: 1fr; }
           .shop__side { display: none; }
           .shop__grid { grid-template-columns: repeat(2, 1fr); }
@@ -179,7 +183,7 @@ background-attachment: fixed;-deep);
             <option value="price-desc">Price: High → Low</option>
             <option value="name">Name: A–Z</option>
           </select>
-          <span className="shop__count">{filtered.length} Results</span>
+          <span className="shop__count">{filtered.length} RESULTS</span>
         </div>
 
         <div className="shop__body">
@@ -256,4 +260,4 @@ background-attachment: fixed;-deep);
       </div>
     </>
   );
-}
+} 
