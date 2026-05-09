@@ -153,6 +153,23 @@ export default function Navbar({ page, navigate }) {
         .nav__burger.open span:nth-child(2) { opacity: 0; }
         .nav__burger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
         
+        .nav__overlay {
+          position: fixed;
+          top: 72px;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.3);
+          z-index: 98;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.4s var(--ease-out);
+        }
+        .nav__overlay.open {
+          opacity: 1;
+          pointer-events: auto;
+        }
+        
         .nav__mobile {
           position: fixed;
           top: 72px;
@@ -160,7 +177,7 @@ export default function Navbar({ page, navigate }) {
           right: 0;
           bottom: 0;
           background: var(--white);
-          z-index: 199;
+          z-index: 99;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -173,23 +190,7 @@ export default function Navbar({ page, navigate }) {
           padding: 40px 20px;
         }
         .nav__mobile.open { transform: translateX(0); }
-        .nav__mobile::before {
-          content: '';
-          position: fixed;
-          top: 72px;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.3);
-          z-index: -1;
-          opacity: 0;
-          pointer-events: none;
-          transition: opacity 0.4s var(--ease-out);
-        }
-        .nav__mobile.open::before {
-          opacity: 1;
-          pointer-events: auto;
-        }
+        
         .nav__mobile-link {
           font-family: var(--serif);
           font-size: 42px;
@@ -258,6 +259,8 @@ export default function Navbar({ page, navigate }) {
         </div>
       </nav>
 
+      <div className={`nav__overlay${menuOpen ? " open" : ""}`} onClick={() => setMenuOpen(false)} />
+
       <div className={`nav__mobile${menuOpen ? " open" : ""}`}>
         {LINKS.map((l) => (
           <button key={l} className="nav__mobile-link" onClick={() => go(l)}>
@@ -273,4 +276,4 @@ export default function Navbar({ page, navigate }) {
       </div>
     </>
   );
-}
+} 
