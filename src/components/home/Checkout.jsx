@@ -48,7 +48,7 @@ export default function Checkout({ navigate }) {
   }
 
   const config = {
-    public_key: "FLWPUBK_LIVE_YOUR_PUBLIC_KEY_HERE", // Replace with your actual key
+    public_key: "FLWPUBK_LIVE_YOUR_PUBLIC_KEY_HERE",
     tx_ref: `LAREJI-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     amount: cartTotal,
     currency: currency,
@@ -96,7 +96,6 @@ export default function Checkout({ navigate }) {
 
     setLoading(true)
 
-    // Simulate payment success
     setTimeout(() => {
       submitOrder(`TXN-${Date.now()}`)
     }, 1500)
@@ -209,9 +208,7 @@ export default function Checkout({ navigate }) {
         }
         .field input {
           padding: 13px 16px;
-          background: transparent;
-background-size: cover;
-background-attachment: fixed;-deep);
+          background: var(--white);
           border: 1px solid var(--beige-dark);
           font-family: var(--sans);
           font-size: 13px;
@@ -228,12 +225,13 @@ background-attachment: fixed;-deep);
           opacity: 0.7;
         }
         .checkout-summary {
-          background: transparent;
-background-size: cover;
-background-attachment: fixed;-deep);
+          background: var(--white);
+          border: 1px solid var(--beige-dark);
+          border-radius: 8px;
           padding: 36px 28px;
           position: sticky;
           top: 100px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
         .checkout-summary__title {
           font-family: var(--serif);
