@@ -521,7 +521,7 @@ export default function Checkout({ navigate }) {
                 </p>
               </div>
             </div>
-          </div>
+           </div>
         </Container>
       </section>
     </>

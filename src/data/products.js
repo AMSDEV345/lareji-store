@@ -61,13 +61,6 @@ export const PRODUCTS = [
   { id: 43, name: "Stockfish Head", slug: "stockfish-head", image: "/stockfish-head.jpg", category: "protein", categoryLabel: "Dried Protein", price: 4500, oldPrice: null, badge: null, sizes: ["250g","500g","1kg"], description: "Stockfish head — deep, rich flavour perfect for Ofe Onugbu, Oha soup, and Banga.", details: "Imported. Quality-checked. Sealed fresh.", emoji: "🐟", featured: false, inStock: true },
 ];
 
-export const WHY_CHOOSE = [
-  { num: "01", title: "Premium Sourcing", text: "Every product is handpicked from trusted African farms, selected for freshness, quality, and authenticity above all else." },
-  { num: "02", title: "Hygienic Packaging", text: "Sealed in airtight transparent packaging that preserves flavour and meets international export standards." },
-  { num: "03", title: "Reliable Delivery", text: "Fast, dependable shipping across Nigeria and internationally, handled with the care your ingredients deserve." },
-  { num: "04", title: "Authentic Flavours", text: "No shortcuts, no compromise. Real African ingredients the way your kitchen has always deserved them." },
-];
-
 export const TESTIMONIALS = [
   { name: "Amaka O.", city: "Lagos", text: "The Ofada rice is unlike anything I've tasted since my grandmother's kitchen. LAREJI is the real deal." },
   { name: "Funmi A.", city: "London", text: "Finally — an African food brand that ships internationally without the quality drop. The stockfish arrived perfect." },

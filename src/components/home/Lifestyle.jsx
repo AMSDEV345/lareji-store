@@ -51,13 +51,18 @@ export default function Lifestyle() {
   return (
     <>
       <style>{`
-        .life { padding: 88px 0; overflow: hidden; }
+        .life { 
+          padding: 88px 0; 
+          overflow: hidden; 
+        }
+
         .life__grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           gap: 20px;
           margin-top: 52px;
         }
+
         .life-card {
           position: relative;
           overflow: hidden;
@@ -66,11 +71,16 @@ export default function Lifestyle() {
           will-change: transform;
           cursor: pointer;
         }
-        .life-card:hover { transform: scale(1.02); }
+
+        .life-card:hover { 
+          transform: scale(1.02); 
+        }
+
         .life-card.main {
           grid-column: 1 / -1;
           height: 520px;
         }
+
         .life-card__img {
           position: absolute;
           inset: 0;
@@ -79,12 +89,14 @@ export default function Lifestyle() {
           object-fit: cover;
           z-index: 1;
         }
+
         .life-card__overlay {
           position: absolute;
           inset: 0;
           background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 40%, rgba(0, 0, 0, 0.7) 100%);
           z-index: 2;
         }
+
         .life-card__content {
           position: absolute;
           bottom: 0;
@@ -93,10 +105,16 @@ export default function Lifestyle() {
           z-index: 3;
           padding: 40px 36px;
           color: var(--white);
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          min-height: 100%;
         }
+
         .life-card.main .life-card__content {
           padding: 60px 48px;
         }
+
         .life-card__label {
           font-size: 10px;
           letter-spacing: 3px;
@@ -105,6 +123,7 @@ export default function Lifestyle() {
           margin-bottom: 10px;
           display: block;
         }
+
         .life-card__title {
           font-family: var(--serif);
           font-size: 22px;
@@ -113,20 +132,29 @@ export default function Lifestyle() {
           color: var(--white);
           margin: 0 0 12px 0;
         }
+
         .life-card.main .life-card__title {
           font-size: 36px;
+          line-height: 1.3;
           margin-bottom: 16px;
         }
+
         .life-card__desc {
           font-size: 13px;
           line-height: 1.6;
           color: rgba(255, 255, 255, 0.85);
           margin: 0;
         }
+
+        .life-card__desc + .life-card__desc {
+          margin-top: 12px;
+        }
+
         .life-card.main .life-card__desc {
           font-size: 14px;
           max-width: 500px;
         }
+
         .life-card__bar {
           position: absolute;
           bottom: 0;
@@ -139,21 +167,124 @@ export default function Lifestyle() {
           transition: transform 0.4s var(--ease-out);
           z-index: 4;
         }
+
         .life-card:hover .life-card__bar {
           transform: scaleX(1);
         }
-        @media (max-width: 900px) {
+
+        /* MOBILE: Keep 2 columns */
+        @media (max-width: 768px) {
+          .life {
+            padding: 64px 0;
+          }
+
           .life__grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 40px;
           }
-          .life-card.main {
-            grid-column: auto;
-          }
+
           .life-card {
-            height: 320px;
+            height: 300px;
           }
+
           .life-card.main {
-            height: 450px;
+            grid-column: 1 / -1;
+            height: 520px;
+          }
+
+          .life-card__content {
+            padding: 24px 16px;
+          }
+
+          .life-card.main .life-card__content {
+            padding: 40px 24px;
+          }
+
+          .life-card__label {
+            font-size: 9px;
+            letter-spacing: 2.5px;
+            margin-bottom: 8px;
+          }
+
+          .life-card__title {
+            font-size: 16px;
+            line-height: 1.25;
+            margin-bottom: 8px;
+          }
+
+          .life-card.main .life-card__title {
+            font-size: 32px;
+            line-height: 1.3;
+            margin-bottom: 14px;
+          }
+
+          .life-card__desc {
+            font-size: 12px;
+            line-height: 1.5;
+          }
+
+          .life-card.main .life-card__desc {
+            font-size: 13px;
+            line-height: 1.6;
+            max-width: 100%;
+          }
+
+          .life-card__desc + .life-card__desc {
+            margin-top: 10px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .life {
+            padding: 48px 0;
+          }
+
+          .life__grid {
+            gap: 12px;
+            margin-top: 32px;
+          }
+
+          .life-card {
+            height: 260px;
+          }
+
+          .life-card.main {
+            height: 480px;
+          }
+
+          .life-card__content {
+            padding: 20px 12px;
+          }
+
+          .life-card.main .life-card__content {
+            padding: 32px 20px;
+          }
+
+          .life-card__label {
+            font-size: 8px;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+          }
+
+          .life-card__title {
+            font-size: 14px;
+            margin-bottom: 6px;
+          }
+
+          .life-card.main .life-card__title {
+            font-size: 24px;
+            line-height: 1.25;
+            margin-bottom: 10px;
+          }
+
+          .life-card__desc {
+            font-size: 11px;
+            line-height: 1.4;
+          }
+
+          .life-card.main .life-card__desc {
+            font-size: 12px;
           }
         }
       `}</style>

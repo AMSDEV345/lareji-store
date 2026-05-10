@@ -47,19 +47,11 @@ export default function PromoBanner({ navigate }) {
           <Button variant="ghost" size="lg" onClick={() => navigate("shop")}>
             Explore Products
           </Button>
-          <div className="promo__contacts">
-            {[
-              ["WhatsApp", "+234 9161244319"],
-              ["Instagram", "@lareji.store"],
-              ["TikTok", "@lareji.co"],
-            ].map(([l, v]) => (
-              <div key={l}>
-                <p className="promo__cl">{l}</p>
-                <p className="promo__cv">{v}</p>
-              </div>
-            ))}
+            
+
+        
           </div>
-        </div>
+        
       </section>
     </>
   );

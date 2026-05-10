@@ -6,7 +6,7 @@ import Categories from "../components/home/Categories";
 import FeaturedProducts from "../components/home/FeaturedProducts";
 import PromoBanner from "../components/home/PromoBanner";
 import Lifestyle from "../components/home/Lifestyle";
-import WhyChooseUs from "../components/home/WhyChooseUs";
+
 import Container from "../components/common/Container";
 import { TESTIMONIALS } from "../data/products";
 import { useScrollReveal } from "../hooks/useScrollReveal";
@@ -126,7 +126,7 @@ background-attachment: fixed;-dark); border: none; cursor: pointer; padding: 0;
       <FeaturedProducts navigate={navigate} />
       <PromoBanner navigate={navigate} />
       <Lifestyle />
-      <WhyChooseUs />
+      
 
       {/* Testimonials */}
       <section className="testi">

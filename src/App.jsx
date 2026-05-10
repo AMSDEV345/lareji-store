@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { CartProvider } from "./context/CartContext";
-import { CountryProvider } from "./context/CountryContext";
 import { AdminProvider } from "./context/AdminContext";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import CartDrawer from "./components/CartDrawer";
-import CountryModal from "./components/CountryModal";
-import { detectCountry, COUNTRY_CURRENCIES } from "./utils/geo";
+import CurrencyModal from "./context/CurrencyModal";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
@@ -19,20 +17,28 @@ import AdminDashboard from "./pages/AdminDashboard";
 import TrackOrder from "./pages/TrackOrder";
 import "./styles/global.css";
 
+const CURRENCIES = {
+  NGN: { name: "Nigerian Naira", symbol: "₦", code: "NGN" },
+  USD: { name: "US Dollar", symbol: "$", code: "USD" },
+  GBP: { name: "British Pound", symbol: "£", code: "GBP" },
+  EUR: { name: "Euro", symbol: "€", code: "EUR" },
+  JPY: { name: "Japanese Yen", symbol: "¥", code: "JPY" },
+  SGD: { name: "Singapore Dollar", symbol: "S$", code: "SGD" },
+  KRW: { name: "South Korean Won", symbol: "₩", code: "KRW" },
+};
+
 export default function App() {
   const [page, setPage] = useState("home");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [visible, setVisible] = useState(true);
-  const [showCountryModal, setShowCountryModal] = useState(false);
+  const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const [detected, setDetected] = useState(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("lareji_country");
+    const stored = localStorage.getItem("lareji_currency");
     if (!stored) {
-      detectCountry().then((geo) => {
-        setDetected(geo);
-        setShowCountryModal(true);
-      });
+      setDetected({ currencyCode: "NGN" });
+      setShowCurrencyModal(true);
     }
   }, []);
 
@@ -46,16 +52,18 @@ export default function App() {
     }, 200);
   };
 
-  const handleCountrySelect = (countryCode) => {
-    const currencyData = COUNTRY_CURRENCIES[countryCode];
+  const handleCurrencySelect = (currencyCode) => {
+    const currencyData = CURRENCIES[currencyCode];
     localStorage.setItem(
-      "lareji_country",
+      "lareji_currency",
       JSON.stringify({
-        countryCode,
-        currency: currencyData.currency,
+        currencyCode,
+        currency: currencyData.code,
+        symbol: currencyData.symbol,
+        name: currencyData.name,
       })
     );
-    setShowCountryModal(false);
+    setShowCurrencyModal(false);
     window.location.reload();
   };
 
@@ -86,28 +94,26 @@ export default function App() {
 
   return (
     <AdminProvider>
-      <CountryProvider>
-        <CartProvider>
-          {showCountryModal && (
-            <CountryModal onSelect={handleCountrySelect} detected={detected} />
-          )}
-          <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-            <Navbar page={page} navigate={navigate} />
-            <main
-              style={{
-                flex: 1,
-                opacity: visible ? 1 : 0,
-                transform: visible ? "translateY(0)" : "translateY(10px)",
-                transition: "opacity 0.25s ease, transform 0.25s ease",
-              }}
-            >
-              {renderPage()}
-            </main>
-            <Footer navigate={navigate} />
-            <CartDrawer navigate={navigate} />
-          </div>
-        </CartProvider>
-      </CountryProvider>
+      <CartProvider>
+        {showCurrencyModal && (
+          <CurrencyModal onSelect={handleCurrencySelect} detected={detected} />
+        )}
+        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+          <Navbar page={page} navigate={navigate} />
+          <main
+            style={{
+              flex: 1,
+              opacity: visible ? 1 : 0,
+              transform: visible ? "translateY(0)" : "translateY(10px)",
+              transition: "opacity 0.25s ease, transform 0.25s ease",
+            }}
+          >
+            {renderPage()}
+          </main>
+          <Footer navigate={navigate} />
+          <CartDrawer navigate={navigate} />
+        </div>
+      </CartProvider>
     </AdminProvider>
   );
 }

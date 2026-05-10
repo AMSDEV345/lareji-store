@@ -22,7 +22,11 @@
 }
 
 html { 
-  scroll-behavior: smooth; 
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -34,6 +38,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
 }
 
 button { cursor: pointer; font-family: var(--sans); }
@@ -375,7 +383,7 @@ FOCUS STYLES
 }
 
 #next-steps ul .logo {
-  height: 18px;
+  height: 18px;  
 }
 
 #next-steps ul a {
@@ -479,7 +487,18 @@ FOCUS STYLES
   flex-shrink: 0;
 }
 
-/* Remove white backgrounds from page sections */
+/* ============================================
+FIX: Remove white backgrounds & overflow issues
+============================================ */
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 main,
 .page-container,
 .track-section,
@@ -487,4 +506,9 @@ main,
 .about-section,
 .shop-section {
   background-color: transparent !important;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
