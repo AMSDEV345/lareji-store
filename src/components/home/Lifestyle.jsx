@@ -257,11 +257,6 @@ export default function Lifestyle({ navigate }) {
             margin-bottom: 8px;
           }
 
-          .life-card__desc {
-            font-size: 12px;
-            line-height: 1.5;
-          }
-
           .life__promo-title {
             font-size: 32px;
           }
@@ -311,11 +306,6 @@ export default function Lifestyle({ navigate }) {
             margin-bottom: 6px;
           }
 
-          .life-card__desc {
-            font-size: 11px;
-            line-height: 1.4;
-          }
-
           .life__promo-title {
             font-size: 24px;
           }
@@ -334,7 +324,24 @@ export default function Lifestyle({ navigate }) {
           </div>
 
           <div className="life__grid" ref={gridRef}>
-            {/* Promo Banner */}
+            {/* Secondary Cards */}
+            {CARDS.map((c) => (
+              <div key={c.label} className="life-card">
+                <img
+                  className="life-card__img"
+                  src={c.image}
+                  alt={c.label}
+                />
+                <div className="life-card__overlay" />
+                <div className="life-card__bar" />
+                <div className="life-card__content">
+                  <span className="life-card__label">{c.label}</span>
+                  <h4 className="life-card__title">{c.title}</h4>
+                </div>
+              </div>
+            ))}
+
+            {/* Promo Banner - After Cards */}
             <div className="life__promo" ref={promoRef}>
               <div className="life__promo-circle1" />
               <div className="life__promo-circle2" />
@@ -356,26 +363,9 @@ export default function Lifestyle({ navigate }) {
                 </Button>
               </div>
             </div>
-
-            {/* Secondary Cards */}
-            {CARDS.map((c) => (
-              <div key={c.label} className="life-card">
-                <img
-                  className="life-card__img"
-                  src={c.image}
-                  alt={c.label}
-                />
-                <div className="life-card__overlay" />
-                <div className="life-card__bar" />
-                <div className="life-card__content">
-                  <span className="life-card__label">{c.label}</span>
-                  <h4 className="life-card__title">{c.title}</h4>
-                </div>
-              </div>
-            ))}
           </div>
         </Container>
       </section>
     </>
   );
-}
+} 
