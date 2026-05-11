@@ -4,8 +4,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Hero from "../components/home/Hero";
 import Categories from "../components/home/Categories";
 import FeaturedProducts from "../components/home/FeaturedProducts";
-
 import Lifestyle from "../components/home/Lifestyle";
+import PromoBanner from "../components/home/PromoBanner";
 import Container from "../components/common/Container";
 import { TESTIMONIALS } from "../data/products";
 import { useScrollReveal } from "../hooks/useScrollReveal";
@@ -273,7 +273,9 @@ export default function Home({ navigate }) {
       <Categories navigate={navigate} />
       <FeaturedProducts navigate={navigate} />
       
-      <Lifestyle />
+      <Lifestyle navigate={navigate} />
+      
+      <PromoBanner navigate={navigate} />
 
       {/* Testimonials */}
       <section className="testi">

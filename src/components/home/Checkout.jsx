@@ -48,7 +48,7 @@ export default function Checkout({ navigate }) {
   }
 
   const config = {
-    public_key: "FLWPUBK_LIVE_YOUR_PUBLIC_KEY_HERE",
+    public_key: "FLWSECK-fb77a8df1fe89dd2405b20bcb5bea438-19df71106d1vt-X",
     tx_ref: `LAREJI-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     amount: cartTotal,
     currency: currency,

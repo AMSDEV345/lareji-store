@@ -40,7 +40,7 @@ export function AdminProvider({ children }) {
   };
 
   return (
-    <AdminContext.Provider value={{ isAdmin, adminUser, login, logout }}>
+    <AdminContext.Provider value={{ isAdmin, adminUser, login, logout }}>  
       {children}
     </AdminContext.Provider>
   );
