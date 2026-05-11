@@ -4,7 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Hero from "../components/home/Hero";
 import Categories from "../components/home/Categories";
 import FeaturedProducts from "../components/home/FeaturedProducts";
-import PromoBanner from "../components/home/PromoBanner";
+
 import Lifestyle from "../components/home/Lifestyle";
 import Container from "../components/common/Container";
 import { TESTIMONIALS } from "../data/products";
@@ -272,7 +272,7 @@ export default function Home({ navigate }) {
 
       <Categories navigate={navigate} />
       <FeaturedProducts navigate={navigate} />
-      <PromoBanner navigate={navigate} />
+      
       <Lifestyle />
 
       {/* Testimonials */}
