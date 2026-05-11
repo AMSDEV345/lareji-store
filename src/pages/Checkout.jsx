@@ -51,8 +51,17 @@ export default function Checkout({ navigate }) {
     try {
       const txRef = `lareji_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-      // Call your backend API
-      const response = await fetch("https://lareji-backend.vercel.app/api/payments/initialize", {
+      console.log("Attempting to call backend...");
+      console.log("Form data:", {
+        email: form.email,
+        fullName: form.fullName,
+        phone: form.phone,
+        address: form.address,
+        amount: cartTotal,
+        tx_ref: txRef,
+      });
+
+      const response = await fetch("https://lareji-store-backend.vercel.app/api/payments/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -65,18 +74,21 @@ export default function Checkout({ navigate }) {
         }),
       });
 
+      console.log("Response status:", response.status);
       const data = await response.json();
+      console.log("Response data:", data);
 
       if (data.success && data.link) {
-        // Redirect to Flutterwave payment page
+        clearCart();
+        localStorage.removeItem("lareji_cart");
         window.location.href = data.link;
       } else {
         setError(data.error || "Failed to initialize payment. Please try again.");
         setLoading(false);
       }
     } catch (err) {
-      console.error("Payment error:", err);
-      setError("An error occurred. Please try again.");
+      console.error("Full error:", err);
+      setError("An error occurred: " + err.message);
       setLoading(false);
     }
   };
