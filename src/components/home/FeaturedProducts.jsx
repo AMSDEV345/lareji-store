@@ -121,6 +121,8 @@ export default function FeaturedProducts({ navigate }) {
           transition: box-shadow 0.3s ease;
           will-change: transform;
           transform-style: preserve-3d;
+          display: flex;
+          flex-direction: column;
         }
 
         .pc:hover {
@@ -212,6 +214,9 @@ export default function FeaturedProducts({ navigate }) {
         /* ── Body ── */
         .pc__body {
           padding: 18px 20px 22px;
+          display: flex;
+          flex-direction: column;
+          flex: 1;
         }
 
         .pc__cat {
@@ -268,6 +273,9 @@ export default function FeaturedProducts({ navigate }) {
           align-items: center;
           justify-content: space-between;
           gap: 8px;
+          margin-top: auto;
+          padding-top: 14px;
+          border-top: 1px solid var(--beige-dark);
         }
 
         .pc__price {
