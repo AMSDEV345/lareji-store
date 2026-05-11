@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import Container from "../components/common/Container";
 import Button from "../components/common/Button";
@@ -15,38 +15,6 @@ export default function Checkout({ navigate }) {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [scriptLoaded, setScriptLoaded] = useState(false);
-
-  // Load Flutterwave script on mount
-  useEffect(() => {
-    const loadFlutterwave = () => {
-      // Check if already loaded
-      if (window.FlutterWaveCheckout) {
-        console.log("✅ Flutterwave already loaded");
-        setScriptLoaded(true);
-        return;
-      }
-
-      const script = document.createElement("script");
-      script.src = "https://checkout.flutterwave.com/v3.js";
-      script.async = true;
-      script.crossOrigin = "anonymous";
-      
-      script.onload = () => {
-        console.log("✅ Flutterwave script loaded successfully");
-        setScriptLoaded(true);
-      };
-      
-      script.onerror = () => {
-        console.error("❌ Failed to load Flutterwave script");
-        setError("Payment service unavailable. Please try refreshing the page.");
-      };
-      
-      document.head.appendChild(script);
-    };
-
-    loadFlutterwave();
-  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -74,57 +42,38 @@ export default function Checkout({ navigate }) {
     return true;
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (!validateForm()) return;
-
-    if (!scriptLoaded || !window.FlutterWaveCheckout) {
-      setError("Payment service is loading. Please wait a moment and try again.");
-      return;
-    }
 
     setLoading(true);
     setError("");
 
-    // Generate unique transaction reference
-    const txRef = `lareji_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
     try {
-      window.FlutterWaveCheckout({
-        public_key: "FLWPUBK-610ac333c8f4ad4d8d8bc479891f1a87-X",
-        tx_ref: txRef,
-        amount: cartTotal,
-        currency: "NGN",
-        payment_options: "card,ussd,bank_transfer",
-        customer: {
-          email: form.email,
-          phone_number: form.phone,
-          name: form.fullName,
-        },
-        customizations: {
-          title: "LAREJI Store",
-          description: "Premium African essentials",
-          logo: "https://lareji.co/logo.png",
-        },
-        callback: function (data) {
-          console.log("Payment response:", data);
-          setLoading(false);
+      const txRef = `lareji_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-          if (data.status === "successful") {
-            alert("✅ Payment successful! Your order is being processed.");
-            clearCart();
-            localStorage.removeItem("lareji_cart");
-            setTimeout(() => navigate("shop"), 2000);
-          } else if (data.status === "cancelled") {
-            setError("Payment was cancelled. Please try again.");
-          } else {
-            setError("Payment failed. Please try again.");
-          }
-        },
-        onclose: function () {
-          console.log("Payment modal closed");
-          setLoading(false);
-        },
+      // Call your backend API
+      const response = await fetch("https://lareji-backend.vercel.app/api/payments/initialize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          fullName: form.fullName,
+          phone: form.phone,
+          address: form.address,
+          amount: cartTotal,
+          tx_ref: txRef,
+        }),
       });
+
+      const data = await response.json();
+
+      if (data.success && data.link) {
+        // Redirect to Flutterwave payment page
+        window.location.href = data.link;
+      } else {
+        setError(data.error || "Failed to initialize payment. Please try again.");
+        setLoading(false);
+      }
     } catch (err) {
       console.error("Payment error:", err);
       setError("An error occurred. Please try again.");
@@ -343,16 +292,6 @@ export default function Checkout({ navigate }) {
           color: var(--green);
         }
 
-        .checkout__loading {
-          background: rgba(51, 130, 100, 0.08);
-          border: 1px solid var(--green);
-          padding: 12px 16px;
-          border-radius: 2px;
-          color: var(--green);
-          font-size: 13px;
-          animation: slideDown 0.3s ease-out;
-        }
-
         @media (max-width: 768px) {
           .checkout__body {
             grid-template-columns: 1fr;
@@ -375,7 +314,6 @@ export default function Checkout({ navigate }) {
             {/* Form */}
             <form className="checkout__form" onSubmit={(e) => e.preventDefault()}>
               {error && <div className="checkout__error">❌ {error}</div>}
-              {!scriptLoaded && <div className="checkout__loading">⏳ Loading payment service...</div>}
 
               <div>
                 <h3 className="checkout__form-section-title">Delivery Information</h3>
@@ -439,9 +377,9 @@ export default function Checkout({ navigate }) {
                 size="lg"
                 fullWidth
                 onClick={handlePayment}
-                disabled={loading || !scriptLoaded}
+                disabled={loading}
               >
-                {!scriptLoaded ? "Loading payment..." : loading ? "Processing..." : `Pay ₦${cartTotal.toLocaleString()}`}
+                {loading ? "Processing..." : `Pay ₦${cartTotal.toLocaleString()}`}
               </Button>
 
               <p style={{ textAlign: "center", fontSize: "12px", color: "var(--muted)" }}>
