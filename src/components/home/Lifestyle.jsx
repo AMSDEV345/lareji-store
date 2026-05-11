@@ -18,22 +18,10 @@ const CARDS = [
 export default function Lifestyle({ navigate }) {
   const titleRef = useScrollReveal({ y: 30 });
   const gridRef = useRef(null);
-  const mainRef = useRef(null);
   const promoRef = useScrollReveal({ y: 40, delay: 0.1 });
 
   useEffect(() => {
-    gsap.to(mainRef.current, {
-      yPercent: -8,
-      ease: "none",
-      scrollTrigger: {
-        trigger: gridRef.current,
-        start: "top bottom",
-        end: "bottom top",
-        scrub: 1.2,
-      },
-    });
-
-    const smalls = gridRef.current.querySelectorAll(".life-card:not(.main)");
+    const smalls = gridRef.current.querySelectorAll(".life-card");
     gsap.fromTo(
       smalls,
       { x: 40, opacity: 0 },
@@ -42,18 +30,6 @@ export default function Lifestyle({ navigate }) {
         opacity: 1,
         stagger: 0.12,
         duration: 0.8,
-        ease: "power3.out",
-        scrollTrigger: { trigger: gridRef.current, start: "top 82%" },
-      }
-    );
-
-    gsap.fromTo(
-      mainRef.current,
-      { x: -50, opacity: 0 },
-      {
-        x: 0,
-        opacity: 1,
-        duration: 1,
         ease: "power3.out",
         scrollTrigger: { trigger: gridRef.current, start: "top 82%" },
       }
@@ -79,7 +55,7 @@ export default function Lifestyle({ navigate }) {
           margin-top: 32px;
         }
 
-        /* ── Main Card ── */
+        /* ── Card ── */
         .life-card {
           position: relative;
           overflow: hidden;
@@ -92,12 +68,6 @@ export default function Lifestyle({ navigate }) {
 
         .life-card:hover {
           transform: scale(1.02);
-        }
-
-        .life-card.main {
-          grid-column: 1 / -1;
-          height: auto;
-          min-height: 420px;
         }
 
         /* ── Image ── */
@@ -138,12 +108,6 @@ export default function Lifestyle({ navigate }) {
           min-height: 100%;
         }
 
-        .life-card.main .life-card__content {
-          padding: 48px 40px;
-          position: relative;
-          min-height: auto;
-        }
-
         /* ── Label ── */
         .life-card__label {
           font-size: 10px;
@@ -162,30 +126,6 @@ export default function Lifestyle({ navigate }) {
           line-height: 1.35;
           color: var(--white);
           margin: 0 0 12px 0;
-        }
-
-        .life-card.main .life-card__title {
-          font-size: 36px;
-          line-height: 1.3;
-          margin-bottom: 16px;
-        }
-
-        /* ── Description ── */
-        .life-card__desc {
-          font-size: 13px;
-          line-height: 1.6;
-          color: rgba(255, 255, 255, 0.85);
-          margin: 0;
-        }
-
-        .life-card__desc + .life-card__desc {
-          margin-top: 12px;
-        }
-
-        .life-card.main .life-card__desc {
-          font-size: 14px;
-          max-width: 500px;
-          line-height: 1.7;
         }
 
         /* ── Bar Hover ── */
@@ -294,11 +234,6 @@ export default function Lifestyle({ navigate }) {
             height: 340px;
           }
 
-          .life-card.main {
-            height: auto;
-            min-height: 380px;
-          }
-
           .life__promo {
             grid-column: 1 / -1;
             grid-template-columns: 1fr;
@@ -309,10 +244,6 @@ export default function Lifestyle({ navigate }) {
 
           .life-card__content {
             padding: 28px 20px;
-          }
-
-          .life-card.main .life-card__content {
-            padding: 36px 28px;
           }
 
           .life-card__label {
@@ -326,19 +257,9 @@ export default function Lifestyle({ navigate }) {
             margin-bottom: 8px;
           }
 
-          .life-card.main .life-card__title {
-            font-size: 28px;
-            margin-bottom: 12px;
-          }
-
           .life-card__desc {
             font-size: 12px;
             line-height: 1.5;
-          }
-
-          .life-card.main .life-card__desc {
-            font-size: 13px;
-            line-height: 1.6;
           }
 
           .life__promo-title {
@@ -365,11 +286,6 @@ export default function Lifestyle({ navigate }) {
             height: 280px;
           }
 
-          .life-card.main {
-            height: auto;
-            min-height: 340px;
-          }
-
           .life__promo {
             grid-column: 1 / -1;
             grid-template-columns: 1fr;
@@ -381,10 +297,6 @@ export default function Lifestyle({ navigate }) {
 
           .life-card__content {
             padding: 20px 14px;
-          }
-
-          .life-card.main .life-card__content {
-            padding: 28px 18px;
           }
 
           .life-card__label {
@@ -399,19 +311,9 @@ export default function Lifestyle({ navigate }) {
             margin-bottom: 6px;
           }
 
-          .life-card.main .life-card__title {
-            font-size: 20px;
-            margin-bottom: 10px;
-          }
-
           .life-card__desc {
             font-size: 11px;
             line-height: 1.4;
-          }
-
-          .life-card.main .life-card__desc {
-            font-size: 12px;
-            line-height: 1.5;
           }
 
           .life__promo-title {
@@ -432,33 +334,7 @@ export default function Lifestyle({ navigate }) {
           </div>
 
           <div className="life__grid" ref={gridRef}>
-            {/* Main Heritage Card */}
-            <div className="life-card main" ref={mainRef}>
-              <img
-                className="life-card__img"
-                src="/heritage.jpg"
-                alt="Heritage - African ingredients sourced from local farmers"
-              />
-              <div className="life-card__overlay" />
-              <div className="life-card__bar" />
-              <div className="life-card__content">
-                <span className="life-card__label">Heritage</span>
-                <h3 className="life-card__title">
-                  Rooted in African Tradition, Refined for You.
-                </h3>
-                <p className="life-card__desc">
-                  We source the finest African ingredients directly from local
-                  farmers and producers who share our passion for quality,
-                  authenticity and heritage.
-                </p>
-                <p className="life-card__desc">
-                  From our land to your table. Naturally. Responsibly. Carefully
-                  selected.
-                </p>
-              </div>
-            </div>
-
-            {/* Promo Banner - Integrated with Reduced Spacing */}
+            {/* Promo Banner */}
             <div className="life__promo" ref={promoRef}>
               <div className="life__promo-circle1" />
               <div className="life__promo-circle2" />
@@ -481,7 +357,7 @@ export default function Lifestyle({ navigate }) {
               </div>
             </div>
 
-            {/* Secondary Cards - Bigger & Bolder */}
+            {/* Secondary Cards */}
             {CARDS.map((c) => (
               <div key={c.label} className="life-card">
                 <img

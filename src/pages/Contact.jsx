@@ -15,9 +15,9 @@ const CONTACT_ITEMS = [
 const SOCIALS = [
   { label: "WhatsApp",  href: "https://wa.me/2349161244319",        handle: "+234 9161244319" },
   { label: "Instagram", href: "https://instagram.com/lareji.store", handle: "@lareji.store"   },
-  { label: "TikTok",    href: "https://tiktok.com/@lareji.co",      handle: "@lareji.co"      },
+    { label: "TikTok",    href: "https://tiktok.com/@lareji.co",      handle: "@lareji.co"      },
 ];
-
+ 
 export default function Contact() {
   const [form, setForm]     = useState({ name: "", email: "", subject: "", message: "" });
   const [sent, setSent]     = useState(false);

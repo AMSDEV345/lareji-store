@@ -364,14 +364,14 @@ export default function About({ navigate }) {
             <div className="about-story__text anim-fade-left">
               <p>
                 <strong>LAREJI started in a family kitchen in Lagos.</strong> Our
-                founder, Lara, noticed that authentic African ingredients were
+                founder,Lanrewaju , noticed that authentic African ingredients were
                 becoming harder to find — and when found, the quality was
                 inconsistent, the packaging poor, and the story behind the
                 product completely absent.
               </p>
               <p>
-                She set out to change that. Working directly with smallholder
-                farmers across Nigeria, she built a supply chain rooted in
+                He set out to change that. Working directly with smallholder
+                farmers across Nigeria, he built a supply chain rooted in
                 trust, transparency, and a genuine love for African food
                 heritage.
               </p>
