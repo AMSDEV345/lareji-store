@@ -1,336 +1,511 @@
-import { useState, useEffect } from "react";
-import { useCart } from "../context/CartContext";
+import { useState, useRef, useEffect } from "react";
+import { gsap } from "gsap";
 import Container from "../components/common/Container";
+import SectionTitle from "../components/common/SectionTitle";
 import Button from "../components/common/Button";
+import { useScrollReveal } from "../hooks/useScrollReveal";
 
-const fmt = (n) => `₦${n.toLocaleString()}`;
+const CONTACT_ITEMS = [
+  { icon: "📲", label: "WhatsApp", value: "+234 9161244319", sub: "Mon–Sat, 8am–8pm" },
+  { icon: "📧", label: "Email", value: "lareji.co@gmail.com", sub: "We reply within 24hrs" },
+  { icon: "📍", label: "Location", value: "Lagos, Nigeria", sub: "Nationwide delivery" },
+  { icon: "📦", label: "Delivery", value: "1–3 Business Days", sub: "Express options available" },
+];
 
-export default function Checkout({ navigate }) {
-  const { items, cartTotal, clearCart } = useCart();
-  const [step, setStep]       = useState(1);
-  const [method, setMethod]   = useState("flutterwave");
-  const [form, setForm]       = useState({
-    firstName: "", lastName: "", email: "", phone: "", address: "", city: "", state: "",
-  });
-  const [copied, setCopied]   = useState(false);
+const SOCIALS = [
+  { label: "WhatsApp", href: "https://wa.me/2349161244319", handle: "+234 9161244319" },
+  { label: "Instagram", href: "https://instagram.com/lareji.store", handle: "@lareji.store" },
+  { label: "TikTok", href: "https://tiktok.com/@lareji.co", handle: "@lareji.co" },
+];
+
+export default function Contact() {
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const titleRef = useRef(null);
+  const tagRef = useRef(null);
+  const formRef = useScrollReveal({ y: 40 });
+  const infoRef = useScrollReveal({ y: 40, delay: 0.15 });
+  const socialRef = useScrollReveal({ y: 30, delay: 0.1 });
 
   useEffect(() => {
-    // Load Flutterwave script dynamically
-    const script = document.createElement('script');
-    script.src = 'https://checkout.flutterwave.com/v3.js';
-    script.async = true;
-    script.onload = () => {
-      console.log('Flutterwave script loaded');
-    };
-    document.head.appendChild(script);
-    
-    return () => {
-      // Cleanup
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
-    };
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+    tl.fromTo(tagRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.2)
+      .fromTo(titleRef.current, { y: 48, opacity: 0 }, { y: 0, opacity: 1, duration: 1.0 }, 0.36);
   }, []);
 
-  const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const copyAccount = () => {
-    navigator.clipboard.writeText("2349161244319");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const placeOrderViaWhatsApp = () => {
-    const lines = items.map((i) => `• ${i.name} (${i.size}) x${i.qty} = ${fmt(i.price * i.qty)}`);
-    const msg = encodeURIComponent(
-      `*New LAREJI Order*\n\nCustomer: ${form.firstName} ${form.lastName}\nPhone: ${form.phone}\nEmail: ${form.email}\nAddress: ${form.address}, ${form.city}, ${form.state}\n\nItems:\n${lines.join("\n")}\n\nTotal: ${fmt(cartTotal)}`
-    );
-    window.open(`https://wa.me/2349161244319?text=${msg}`, "_blank");
-    clearCart();
-    setStep(3);
-  };
-
-  const payWithFlutterwave = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     setLoading(true);
-    
     setTimeout(() => {
-      if (!window.FlutterwaveCheckout) {
-        alert("Flutterwave payment gateway is temporarily unavailable. Please use WhatsApp Order instead or try again later.");
-        setLoading(false);
-        setMethod("whatsapp");
-        return;
-      }
-
-      window.FlutterwaveCheckout({
-        public_key: import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY,
-        tx_ref: `LAREJI-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        amount: cartTotal,
-        currency: "NGN",
-        payment_options: "card,ussd,bank_transfer",
-        customer: {
-          email: form.email,
-          phonenumber: form.phone,
-          name: `${form.firstName} ${form.lastName}`,
-        },
-        customizations: {
-          title: "LAREJI Store",
-          description: `Order for ${form.firstName} ${form.lastName}`,
-          logo: "/logo.png",
-        },
-        callback: (data) => {
-          console.log("Payment response:", data);
-          if (data.status === "completed") {
-            clearCart();
-            setStep(3);
-          } else {
-            alert("Payment was not completed. Please try again.");
-          }
-          setLoading(false);
-        },
-        onclose: () => {
-          console.log("Payment window closed");
-          setLoading(false);
-        },
-      });
-    }, 800);
+      setLoading(false);
+      setSent(true);
+      setForm({ name: "", email: "", subject: "", message: "" });
+    }, 1400);
   };
 
-  if (items.length === 0 && step !== 3) {
-    return (
-      <div style={{ paddingTop: 72, minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ textAlign: "center" }}>
-          <p style={{ fontFamily: "var(--serif)", fontSize: 28, marginBottom: 16 }}>Your cart is empty</p>
-          <Button variant="primary" onClick={() => navigate("shop")}>Shop Now</Button>
-        </div>
-      </div>
-    );
-  }
+  const whatsappDirect = () => {
+    const msg = encodeURIComponent("Hello LAREJI! I'd like to get in touch.");
+    window.open(`https://wa.me/2349161244319?text=${msg}`, "_blank");
+  };
 
   return (
     <>
       <style>{`
-        .ck { padding-top: 72px; }
-        .ck__hero {
-          background: var(--green); padding: clamp(32px,5vw,56px) clamp(20px,6vw,80px);
+        /* ── Hero ── */
+        .contact-hero {
+          margin-top: 72px;
+          background: var(--charcoal);
+          padding: clamp(40px, 8vw, 100px) clamp(28px, 6vw, 80px);
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          min-height: auto;
         }
-        .ck__hero-label { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
-        .ck__hero-title { font-family: var(--serif); font-size: clamp(28px,4vw,52px); font-weight: 300; color: var(--white); line-height: 1.1; }
-        .ck__steps {
-          display: flex; align-items: center; gap: 0;
-          padding: 20px clamp(20px,6vw,80px); background: transparent;
-          border-bottom: 1px solid var(--beige-dark);
-        }
-        .ck__step {
-          display: flex; align-items: center; gap: 10px;
-          font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
-          color: var(--muted); font-family: var(--sans);
-        }
-        .ck__step.active { color: var(--green); }
-        .ck__step.done   { color: var(--charcoal); }
-        .ck__step-num {
-          width: 26px; height: 26px; border-radius: 50%;
-          background: var(--beige-dark); color: var(--muted);
-          display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500;
-        }
-        .ck__step.active .ck__step-num { background: var(--green); color: var(--white); }
-        .ck__step.done .ck__step-num   { background: var(--charcoal); color: var(--white); }
-        .ck__step-divider { flex: 1; height: 1px; background: var(--beige-dark); margin: 0 16px; max-width: 48px; }
-        .ck__body { display: grid; grid-template-columns: 1fr 360px; gap: 32px; padding: 48px 0 80px; align-items: start; }
-        .ck__panel { background: var(--white); padding: 36px; display: flex; flex-direction: column; gap: 20px; }
-        .ck__panel-title { font-family: var(--serif); font-size: 26px; font-weight: 400; margin-bottom: 4px; }
-        .ck__row   { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .ck__field { display: flex; flex-direction: column; gap: 7px; }
-        .ck__label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
-        .ck__input, .ck__select {
-          padding: 12px 16px; border: 1px solid var(--beige-dark);
-          background: transparent; font-family: var(--sans); font-size: 13px;
-          color: var(--charcoal); outline: none; transition: border-color 0.2s;
-        }
-        .ck__input:focus, .ck__select:focus { border-color: var(--green); }
-        .ck__methods { display: flex; flex-direction: column; gap: 12px; }
-        .ck__method {
-          padding: 18px 20px; border: 1.5px solid var(--beige-dark);
-          cursor: pointer; transition: border-color 0.2s;
-          display: flex; align-items: center; gap: 14px;
-        }
-        .ck__method.active { border-color: var(--green); background: rgba(30,75,50,0.04); }
-        .ck__method-radio {
-          width: 18px; height: 18px; border-radius: 50%;
-          border: 2px solid var(--beige-dark); flex-shrink: 0;
-          display: flex; align-items: center; justify-content: center;
-        }
-        .ck__method.active .ck__method-radio { border-color: var(--green); }
-        .ck__method-radio-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
-        .ck__method-label { font-size: 14px; font-weight: 400; }
-        .ck__method-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
-        .ck__summary {
-          background: var(--beige-deep); padding: 28px;
-          position: sticky; top: 100px; display: flex; flex-direction: column; gap: 14px;
-        }
-        .ck__sum-title { font-family: var(--serif); font-size: 22px; font-weight: 400; margin-bottom: 4px; }
-        .ck__sum-item  { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--beige-dark); }
-        .ck__sum-emoji { width: 44px; height: 44px; background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-        .ck__sum-info  { flex: 1; }
-        .ck__sum-name  { font-size: 14px; font-weight: 400; }
-        .ck__sum-size  { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
-        .ck__sum-price { font-size: 14px; font-weight: 500; color: var(--green); white-space: nowrap; }
-        .ck__sum-row   { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
-        .ck__sum-row.total { border-top: 1px solid var(--beige-dark); padding-top: 12px; }
-        .ck__sum-row.total span:first-child { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--charcoal); }
-        .ck__sum-row.total span:last-child  { font-family: var(--serif); font-size: 26px; color: var(--charcoal); }
 
-        .ck__success {
-          min-height: 70vh; display: flex; flex-direction: column;
-          align-items: center; justify-content: center; gap: 20px;
-          text-align: center; padding: 80px 20px;
+        .contact-hero__circle {
+          position: absolute;
+          right: -80px;
+          top: -80px;
+          width: 480px;
+          height: 480px;
+          border-radius: 50%;
+          border: 1px solid rgba(255,255,255,0.05);
+          pointer-events: none;
+          animation: rotateSlow 40s linear infinite;
         }
-        .ck__success-icon { font-size: 80px; animation: scaleIn 0.5s var(--ease-out); }
-        .ck__success-title { font-family: var(--serif); font-size: clamp(28px,4vw,48px); font-weight: 400; }
-        .ck__success-sub   { font-size: 14px; color: var(--muted); max-width: 440px; line-height: 1.8; font-weight: 300; }
 
-        @media (max-width: 900px) {
-          .ck__body { grid-template-columns: 1fr; }
-          .ck__summary { position: static; }
-          .ck__row { grid-template-columns: 1fr; }
+        .contact-hero__dot {
+          position: absolute;
+          left: 10%;
+          bottom: 15%;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: var(--green);
+          animation: pulse 2.5s ease infinite;
+        }
+
+        .contact-hero__content { position: relative; z-index: 1; }
+
+        .contact-hero__tag {
+          font-size: 10px;
+          letter-spacing: 4px;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.35);
+          font-family: var(--sans);
+          margin-bottom: 22px;
+          display: block;
+        }
+
+        .contact-hero__title {
+          font-family: var(--serif);
+          font-size: clamp(44px, 6vw, 88px);
+          font-weight: 300;
+          color: var(--white);
+          line-height: 1.05;
+        }
+
+        .contact-hero__title em {
+          font-style: italic;
+          color: rgba(255,255,255,0.45);
+        }
+
+        /* ── Main Grid ── */
+        .contact-main { padding: 72px 0; }
+
+        .contact-main__grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 64px;
+          align-items: start;
+        }
+
+        @media (max-width: 860px) {
+          .contact-main__grid {
+            grid-template-columns: 1fr;
+            gap: 48px;
+          }
+        }
+
+        /* ── Form ── */
+        .contact-form { display: flex; flex-direction: column; gap: 18px; }
+
+        .contact-form__row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 14px;
+        }
+
+        @media (max-width: 520px) {
+          .contact-form__row { grid-template-columns: 1fr; }
+        }
+
+        .field { display: flex; flex-direction: column; gap: 7px; }
+
+        .field label {
+          font-size: 9px;
+          letter-spacing: 2.5px;
+          text-transform: uppercase;
+          color: var(--muted);
+          font-family: var(--sans);
+        }
+
+        .field input,
+        .field textarea {
+          padding: 13px 16px;
+          background: var(--white);
+          border: 1px solid var(--beige-dark);
+          font-family: var(--sans);
+          font-size: 13px;
+          color: var(--charcoal);
+          outline: none;
+          transition: border-color 0.25s;
+          resize: none;
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+          border-color: var(--green);
+          background: var(--white);
+        }
+
+        .field input::placeholder,
+        .field textarea::placeholder {
+          color: var(--muted);
+          opacity: 0.7;
+        }
+
+        .field textarea { min-height: 140px; }
+
+        .contact-form__success {
+          background: rgba(30,75,50,0.08);
+          border: 1px solid var(--green);
+          padding: 20px 24px;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          animation: fadeUp 0.5s var(--ease-out) both;
+        }
+
+        .contact-form__success-icon { font-size: 28px; }
+
+        .contact-form__success-text {
+          font-size: 14px;
+          color: var(--green);
+          line-height: 1.6;
+        }
+
+        .contact-form__wa {
+          width: 100%;
+          padding: 15px;
+          background: #25D366;
+          color: var(--white);
+          border: none;
+          font-size: 11px;
+          letter-spacing: 2.5px;
+          text-transform: uppercase;
+          font-family: var(--sans);
+          cursor: pointer;
+          transition: background 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+        }
+
+        .contact-form__wa:hover { background: #1da851; }
+
+        .contact-form__divider {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          color: var(--muted);
+          font-size: 11px;
+          letter-spacing: 1px;
+        }
+
+        .contact-form__divider::before,
+        .contact-form__divider::after {
+          content: '';
+          flex: 1;
+          height: 1px;
+          background: var(--beige-dark);
+        }
+
+        /* ── Info ── */
+        .contact-info { display: flex; flex-direction: column; gap: 16px; }
+
+        .contact-info__item {
+          display: flex;
+          align-items: flex-start;
+          gap: 20px;
+          padding: 20px;
+          background: var(--white);
+          border: 1px solid var(--beige-dark);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .contact-info__item:hover {
+          transform: translateX(6px);
+          box-shadow: -3px 0 0 var(--green);
+        }
+
+        .contact-info__icon {
+          font-size: 26px;
+          flex-shrink: 0;
+          transition: transform 0.4s var(--ease-out);
+        }
+
+        .contact-info__item:hover .contact-info__icon {
+          transform: scale(1.2) rotate(-5deg);
+        }
+
+        .contact-info__label {
+          font-size: 9px;
+          letter-spacing: 2.5px;
+          text-transform: uppercase;
+          color: var(--muted);
+          margin-bottom: 4px;
+        }
+
+        .contact-info__value {
+          font-family: var(--serif);
+          font-size: 18px;
+          font-weight: 400;
+          color: var(--charcoal);
+          margin-bottom: 3px;
+        }
+
+        .contact-info__sub {
+          font-size: 12px;
+          color: var(--muted);
+          font-weight: 300;
+        }
+
+        /* ── Socials ── */
+        .contact-socials {
+          padding: 72px 0;
+          background: var(--beige-deep);
+        }
+
+        .contact-socials__grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+          margin-top: 48px;
+        }
+
+        @media (max-width: 640px) {
+          .contact-socials__grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+        }
+
+        .social-card {
+          background: var(--white);
+          border: 1px solid var(--beige-dark);
+          padding: 32px 24px;
+          text-align: center;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          cursor: pointer;
+          text-decoration: none;
+          display: block;
+        }
+
+        .social-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 36px rgba(0,0,0,0.08);
+        }
+
+        .social-card__label {
+          font-size: 9px;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          color: var(--muted);
+          margin-bottom: 10px;
+          display: block;
+        }
+
+        .social-card__handle {
+          font-family: var(--serif);
+          font-size: 18px;
+          font-weight: 400;
+          color: var(--charcoal);
+          margin-bottom: 14px;
+          display: block;
+        }
+
+        .social-card__arrow {
+          font-size: 10px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: var(--green);
+          opacity: 0;
+          transition: opacity 0.25s, transform 0.25s;
+          display: block;
+        }
+
+        .social-card:hover .social-card__arrow {
+          opacity: 1;
+          transform: translateX(4px);
+        }
+
+        /* ── Map ── */
+        .contact-map {
+          background: var(--beige-dark);
+          height: 200px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          gap: 10px;
+          border-top: 1px solid var(--beige-dark);
+        }
+
+        .contact-map__emoji {
+          font-size: 36px;
+          animation: floatUp 4s ease-in-out infinite;
+        }
+
+        .contact-map__text {
+          font-family: var(--serif);
+          font-size: 18px;
+          color: var(--charcoal);
         }
       `}</style>
 
-      <div className="ck">
-        <div className="ck__hero">
-          <p className="ck__hero-label">Secure Checkout</p>
-          <h1 className="ck__hero-title">Complete Your Order</h1>
+      {/* Hero */}
+      <section className="contact-hero">
+        <div className="contact-hero__circle" />
+        <div className="contact-hero__dot" />
+        <div className="contact-hero__content">
+          <span ref={tagRef} className="contact-hero__tag">Get In Touch</span>
+          <h1 ref={titleRef} className="contact-hero__title">
+            Let's <em>Talk</em>
+          </h1>
         </div>
+      </section>
 
-        {step !== 3 && (
-          <div className="ck__steps">
-            {[["1", "Details", 1], ["2", "Payment", 2]].map(([num, label, s], i) => (
-              <>
-                {i > 0 && <div key={`d${i}`} className="ck__step-divider" />}
-                <div key={num} className={`ck__step${step === s ? " active" : ""}${step > s ? " done" : ""}`}>
-                  <span className="ck__step-num">
-                    {step > s ? "✓" : num}
-                  </span>
-                  <span>{label}</span>
+      {/* Main */}
+      <section className="contact-main">
+        <Container>
+          <div className="contact-main__grid">
+
+            {/* Form */}
+            <div ref={formRef}>
+              <SectionTitle label="Send a Message" title="Write" italic="to Us" style={{ marginBottom: 36 }} />
+              {sent ? (
+                <div className="contact-form__success">
+                  <span className="contact-form__success-icon">✅</span>
+                  <div className="contact-form__success-text">
+                    <strong>Message received!</strong><br />
+                    We'll get back to you within 24 hours.
+                  </div>
                 </div>
-              </>
-            ))}
-          </div>
-        )}
-
-        {step === 3 ? (
-          <div className="ck__success">
-            <div className="ck__success-icon">✅</div>
-            <h2 className="ck__success-title">Order Placed!</h2>
-            <p className="ck__success-sub">
-              Thank you for your order. We've received your details and our team will confirm your order via WhatsApp shortly.
-            </p>
-            <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
-              <Button variant="primary" size="lg" onClick={() => navigate("home")}>Back to Home</Button>
-              <Button variant="secondary" size="lg" onClick={() => navigate("shop")}>Continue Shopping</Button>
+              ) : (
+                <form className="contact-form" onSubmit={handleSubmit}>
+                  <div className="contact-form__row">
+                    <div className="field">
+                      <label>Your Name</label>
+                      <input
+                        name="name"
+                        required
+                        placeholder="e.g. Amaka Obi"
+                        value={form.name}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="field">
+                      <label>Email Address</label>
+                      <input
+                        name="email"
+                        type="email"
+                        required
+                        placeholder="you@example.com"
+                        value={form.email}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="field">
+                    <label>Subject</label>
+                    <input
+                      name="subject"
+                      required
+                      placeholder="e.g. Order enquiry, Wholesale"
+                      value={form.subject}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="field">
+                    <label>Message</label>
+                    <textarea
+                      name="message"
+                      required
+                      placeholder="Tell us what you need..."
+                      value={form.message}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading}>
+                    {loading ? "Sending..." : "Send Message"}
+                  </Button>
+                  <div className="contact-form__divider">or reach us directly</div>
+                  <button type="button" className="contact-form__wa" onClick={whatsappDirect}>
+                    📲 Chat on WhatsApp
+                  </button>
+                </form>
+              )}
             </div>
-          </div>
-        ) : (
-          <Container style={{ paddingTop: 0, paddingBottom: 0 }}>
-            <div className="ck__body">
-              <div>
-                {step === 1 && (
-                  <div className="ck__panel">
-                    <h3 className="ck__panel-title">Delivery Details</h3>
-                    <div className="ck__row">
-                      <div className="ck__field">
-                        <label className="ck__label">First Name</label>
-                        <input className="ck__input" name="firstName" value={form.firstName} onChange={handle} placeholder="Amaka" />
-                      </div>
-                      <div className="ck__field">
-                        <label className="ck__label">Last Name</label>
-                        <input className="ck__input" name="lastName" value={form.lastName} onChange={handle} placeholder="Okafor" />
-                      </div>
-                    </div>
-                    <div className="ck__row">
-                      <div className="ck__field">
-                        <label className="ck__label">Email Address</label>
-                        <input className="ck__input" name="email" type="email" value={form.email} onChange={handle} placeholder="you@email.com" />
-                      </div>
-                      <div className="ck__field">
-                        <label className="ck__label">Phone Number</label>
-                        <input className="ck__input" name="phone" value={form.phone} onChange={handle} placeholder="+234..." />
-                      </div>
-                    </div>
-                    <div className="ck__field">
-                      <label className="ck__label">Delivery Address</label>
-                      <input className="ck__input" name="address" value={form.address} onChange={handle} placeholder="Street address" />
-                    </div>
-                    <div className="ck__row">
-                      <div className="ck__field">
-                        <label className="ck__label">City</label>
-                        <input className="ck__input" name="city" value={form.city} onChange={handle} placeholder="Lagos" />
-                      </div>
-                      <div className="ck__field">
-                        <label className="ck__label">State</label>
-                        <input className="ck__input" name="state" value={form.state} onChange={handle} placeholder="Lagos State" />
-                      </div>
-                    </div>
-                    <Button variant="primary" size="lg" onClick={() => setStep(2)}
-                      disabled={!form.firstName || !form.lastName || !form.phone || !form.address}>
-                      Continue to Payment →
-                    </Button>
-                  </div>
-                )}
 
-                {step === 2 && (
-                  <div className="ck__panel">
-                    <h3 className="ck__panel-title">Payment Method</h3>
-                    <div className="ck__methods">
-                      {[
-                        { id: "flutterwave", label: "Pay with Card (Flutterwave)", sub: "Secure card, USSD & bank transfer payment" },
-                        { id: "whatsapp", label: "WhatsApp Order", sub: "Send your order directly via WhatsApp" },
-                      ].map((m) => (
-                        <div key={m.id} className={`ck__method${method === m.id ? " active" : ""}`} onClick={() => setMethod(m.id)}>
-                          <div className="ck__method-radio">
-                            {method === m.id && <div className="ck__method-radio-dot" />}
-                          </div>
-                          <div>
-                            <p className="ck__method-label">{m.label}</p>
-                            <p className="ck__method-sub">{m.sub}</p>
-                          </div>
-                        </div>
-                      ))}
+            {/* Info */}
+            <div ref={infoRef}>
+              <SectionTitle label="Contact Details" title="Find" italic="Us Here" style={{ marginBottom: 36 }} />
+              <div className="contact-info">
+                {CONTACT_ITEMS.map((item) => (
+                  <div key={item.label} className="contact-info__item">
+                    <span className="contact-info__icon">{item.icon}</span>
+                    <div>
+                      <p className="contact-info__label">{item.label}</p>
+                      <p className="contact-info__value">{item.value}</p>
+                      <p className="contact-info__sub">{item.sub}</p>
                     </div>
-
-                    <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                      <Button variant="secondary" onClick={() => setStep(1)}>← Back</Button>
-                      {method === "flutterwave" ? (
-                        <Button variant="primary" size="lg" onClick={payWithFlutterwave} disabled={loading}>
-                          {loading ? "Processing..." : `Pay ${fmt(cartTotal)}`}
-                        </Button>
-                      ) : (
-                        <Button variant="primary" size="lg" onClick={placeOrderViaWhatsApp}>Place Order →</Button>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="ck__summary">
-                <h3 className="ck__sum-title">Your Order</h3>
-                {items.map((item) => (
-                  <div key={`${item.id}-${item.size}`} className="ck__sum-item">
-                    <div className="ck__sum-emoji">{item.emoji || "🌾"}</div>
-                    <div className="ck__sum-info">
-                      <p className="ck__sum-name">{item.name}</p>
-                      <p className="ck__sum-size">{item.size} · qty {item.qty}</p>
-                    </div>
-                    <span className="ck__sum-price">{fmt(item.price * item.qty)}</span>
                   </div>
                 ))}
-                <div className="ck__sum-row"><span>Subtotal</span><span>{fmt(cartTotal)}</span></div>
-                <div className="ck__sum-row"><span>Delivery</span><span>Free</span></div>
-                <div className="ck__sum-row total"><span>Total</span><span>{fmt(cartTotal)}</span></div>
               </div>
             </div>
-          </Container>
-        )}
+
+          </div>
+        </Container>
+      </section>
+
+      {/* Socials */}
+      <section className="contact-socials">
+        <Container>
+          <div ref={socialRef}>
+            <SectionTitle label="Follow Us" title="Connect on" italic="Social" center />
+          </div>
+          <div className="contact-socials__grid">
+            {SOCIALS.map((s) => (
+              <a key={s.label} className="social-card" href={s.href} target="_blank" rel="noreferrer">
+                <span className="social-card__label">{s.label}</span>
+                <span className="social-card__handle">{s.handle}</span>
+                <span className="social-card__arrow">Visit →</span>
+              </a>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* Map */}
+      <div className="contact-map">
+        <span className="contact-map__emoji">📍</span>
+        <p className="contact-map__text">Lagos, Nigeria</p>
       </div>
     </>
   );

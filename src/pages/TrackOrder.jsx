@@ -14,7 +14,7 @@ const ORDERS = [
       { id: 2, status: "Processing", date: "2024-01-16", icon: "⏳", completed: true },
       { id: 3, status: "Handed to Courier", date: "2024-01-18", icon: "📦", completed: true },
       { id: 4, status: "In Transit (Lagos)", date: "2024-01-19", icon: "🚚", completed: true, current: true },
-      { id: 5, status: "At Airport", date: "2024-01-20", icon: "✈️", completed: false },
+      { id: 5, status: "At Airport", date: "Pending", icon: "✈️", completed: false },
       { id: 6, status: "Shipped Internationally", date: "Pending", icon: "🌍", completed: false },
       { id: 7, status: "Out for Delivery", date: "Pending", icon: "🚚", completed: false },
       { id: 8, status: "Delivered", date: "Pending", icon: "✅", completed: false },
@@ -46,14 +46,14 @@ export default function TrackOrder({ navigate }) {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const order = ORDERS.find(o => o.id === searchId);
+    const order = ORDERS.find((o) => o.id === searchId.trim());
     setSelectedOrder(order);
     setSearched(true);
   };
 
   const getCurrentLocation = () => {
     if (!selectedOrder) return "";
-    const current = selectedOrder.timeline.find(t => t.current);
+    const current = selectedOrder.timeline.find((t) => t.current);
     return current ? current.status : "Unknown";
   };
 
@@ -62,243 +62,279 @@ export default function TrackOrder({ navigate }) {
       <style>{`
         .track-order {
           margin-top: 72px;
-          min-height: calc(100vh - 72px);
+          min-height: auto;
           background: transparent;
-background-size: cover;
-background-attachment: fixed;);
-          padding: 60px 0;
+          padding: 0 0 80px 0;
         }
+
         .track-hero {
           background: var(--green);
           color: var(--white);
-          padding: 80px 0;
-          margin-bottom: 60px;
+          padding: 60px 20px;
           text-align: center;
         }
+
         .track-hero__title {
           font-family: var(--serif);
-          font-size: clamp(36px, 5vw, 56px);
+          font-size: clamp(32px, 5vw, 52px);
           font-weight: 300;
-          margin-bottom: 16px;
+          margin-bottom: 12px;
           line-height: 1.2;
         }
+
         .track-hero__subtitle {
-          font-size: 16px;
-          color: rgba(255, 255, 255, 0.8);
-          margin-bottom: 40px;
-          max-width: 500px;
+          font-size: 15px;
+          color: rgba(255,255,255,0.75);
+          margin-bottom: 36px;
+          max-width: 460px;
           margin-left: auto;
           margin-right: auto;
+          line-height: 1.6;
         }
+
         .search-form {
           display: flex;
-          gap: 12px;
-          max-width: 500px;
+          gap: 0;
+          max-width: 480px;
           margin: 0 auto;
         }
+
         .search-form input {
           flex: 1;
           padding: 14px 18px;
           border: none;
-          background: rgba(255, 255, 255, 0.15);
+          background: rgba(255,255,255,0.15);
           color: var(--white);
           font-family: var(--sans);
           font-size: 14px;
-          border-radius: 4px;
+          outline: none;
+          border-radius: 4px 0 0 4px;
         }
+
         .search-form input::placeholder {
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(255,255,255,0.55);
         }
+
         .search-form button {
-          padding: 14px 32px;
-          background: var(--white);
-          color: var(--green);
+          padding: 14px 28px;
+          background: var(--charcoal);
+          color: var(--white);
           border: none;
-          border-radius: 4px;
+          border-radius: 0 4px 4px 0;
           cursor: pointer;
           font-weight: 500;
           font-family: var(--sans);
-          transition: all 0.3s;
+          font-size: 13px;
+          letter-spacing: 1px;
+          transition: background 0.2s;
+          white-space: nowrap;
         }
+
         .search-form button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+          background: var(--green-mid);
         }
+
         .tracking-result {
           background: var(--white);
           border-radius: 8px;
-          padding: 48px;
-          max-width: 900px;
-          margin: 0 auto;
+          padding: 40px;
+          max-width: 860px;
+          margin: 48px auto 0;
         }
+
         .result-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 40px;
-          padding-bottom: 24px;
+          margin-bottom: 32px;
+          padding-bottom: 20px;
           border-bottom: 2px solid var(--beige-dark);
+          flex-wrap: wrap;
+          gap: 12px;
         }
+
         .result-header__info h2 {
           font-family: var(--serif);
-          font-size: 28px;
-          margin: 0 0 8px 0;
+          font-size: 26px;
+          margin: 0 0 6px 0;
         }
+
         .result-header__info p {
-          font-size: 14px;
+          font-size: 13px;
           color: var(--muted);
           margin: 0;
         }
+
         .result-header__back {
           padding: 10px 20px;
-          background: transparent;
-background-size: cover;
-background-attachment: fixed;-deep);
+          background: var(--beige-deep);
           border: none;
           border-radius: 4px;
           cursor: pointer;
-          font-size: 13px;
-          transition: all 0.2s;
+          font-size: 12px;
+          font-family: var(--sans);
+          color: var(--charcoal);
+          transition: background 0.2s;
         }
+
         .result-header__back:hover {
-          background: transparent;
-background-size: cover;
-background-attachment: fixed;-dark);
+          background: var(--beige-dark);
         }
+
         .current-location {
           background: linear-gradient(135deg, var(--green) 0%, var(--charcoal) 100%);
           color: var(--white);
-          padding: 28px;
-          margin-bottom: 40px;
+          padding: 24px 28px;
+          margin-bottom: 36px;
           border-radius: 8px;
         }
+
         .current-location__label {
           font-size: 10px;
           letter-spacing: 2px;
           text-transform: uppercase;
-          opacity: 0.8;
+          opacity: 0.75;
           margin-bottom: 8px;
         }
+
         .current-location__text {
           font-family: var(--serif);
-          font-size: 28px;
+          font-size: 26px;
           font-weight: 400;
           margin: 0;
         }
+
         .delivery-timeline {
           display: flex;
           flex-direction: column;
-          gap: 16px;
-          margin-bottom: 40px;
+          gap: 0;
+          margin-bottom: 36px;
         }
+
         .timeline-item {
           display: flex;
           gap: 16px;
-          padding: 12px 0;
+          padding: 12px 0 12px 20px;
           border-left: 2px solid var(--beige-dark);
-          padding-left: 16px;
           margin-left: 16px;
           position: relative;
         }
+
         .timeline-item.completed {
           border-left-color: var(--green);
         }
+
         .timeline-item.current {
           border-left-color: var(--green);
           border-left-width: 3px;
         }
+
         .timeline-item::before {
           content: '';
           position: absolute;
-          left: -8px;
-          top: 16px;
+          left: -7px;
+          top: 18px;
           width: 12px;
           height: 12px;
           border-radius: 50%;
-          background: transparent;
-background-size: cover;
-background-attachment: fixed;-dark);
+          background: var(--beige-dark);
         }
+
         .timeline-item.completed::before {
           background: var(--green);
         }
+
         .timeline-item.current::before {
           background: var(--green);
           width: 16px;
           height: 16px;
-          left: -10px;
-          top: 14px;
+          left: -9px;
+          top: 16px;
+          box-shadow: 0 0 0 4px rgba(30,75,50,0.15);
         }
+
         .timeline-icon {
-          font-size: 24px;
-          min-width: 30px;
+          font-size: 20px;
+          min-width: 28px;
         }
-        .timeline-content {
-          flex: 1;
-        }
+
+        .timeline-content { flex: 1; }
+
         .timeline-status {
           font-weight: 500;
-          font-size: 15px;
+          font-size: 14px;
           margin-bottom: 2px;
+          color: var(--charcoal);
         }
-        .timeline-date {
-          font-size: 13px;
+
+        .timeline-item:not(.completed) .timeline-status {
           color: var(--muted);
         }
+
+        .timeline-date {
+          font-size: 12px;
+          color: var(--muted);
+        }
+
         .order-details {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: 28px;
-          padding: 28px;
-          background: transparent;
-background-size: cover;
-background-attachment: fixed;-deep);
+          gap: 24px;
+          padding: 24px;
+          background: var(--beige-deep);
           border-radius: 8px;
         }
+
         .detail-item {
           display: flex;
           flex-direction: column;
         }
+
         .detail-label {
           font-size: 10px;
           letter-spacing: 2px;
           text-transform: uppercase;
           color: var(--muted);
-          margin-bottom: 8px;
+          margin-bottom: 6px;
         }
+
         .detail-value {
-          font-size: 16px;
+          font-size: 15px;
           font-weight: 500;
+          color: var(--charcoal);
         }
+
         .not-found {
           text-align: center;
-          padding: 60px 40px;
+          padding: 60px 24px;
         }
-        .not-found__icon {
-          font-size: 64px;
-          margin-bottom: 20px;
-        }
+
+        .not-found__icon { font-size: 56px; margin-bottom: 16px; }
+
         .not-found__title {
           font-family: var(--serif);
-          font-size: 28px;
-          margin: 0 0 12px 0;
+          font-size: 26px;
+          margin: 0 0 10px 0;
         }
+
         .not-found__text {
           color: var(--muted);
-          margin-bottom: 28px;
+          margin-bottom: 24px;
+          line-height: 1.7;
+          font-size: 14px;
         }
-        @media (max-width: 768px) {
-          .tracking-result {
-            padding: 28px;
-          }
-          .order-details {
-            grid-template-columns: 1fr;
-          }
+
+        @media (max-width: 600px) {
+          .tracking-result { padding: 24px 16px; margin: 32px 16px 0; }
+          .order-details { grid-template-columns: 1fr; }
+          .search-form { flex-direction: column; }
+          .search-form input { border-radius: 4px; }
+          .search-form button { border-radius: 4px; }
         }
       `}</style>
 
       <div className="track-order">
-        {/* Hero Section */}
+        {/* Hero */}
         <div className="track-hero">
           <Container>
             <h1 className="track-hero__title">Track Your Order</h1>
@@ -318,17 +354,16 @@ background-attachment: fixed;-deep);
           </Container>
         </div>
 
+        {/* Results */}
         <Container>
-          {/* Results */}
           {searched && selectedOrder ? (
             <div className="tracking-result">
-              {/* Header */}
               <div className="result-header">
                 <div className="result-header__info">
                   <h2>Order #{selectedOrder.id}</h2>
                   <p>{selectedOrder.customer} • {selectedOrder.destination}</p>
                 </div>
-                <button 
+                <button
                   className="result-header__back"
                   onClick={() => {
                     setSearchId("");
@@ -340,17 +375,15 @@ background-attachment: fixed;-deep);
                 </button>
               </div>
 
-              {/* Current Location */}
               <div className="current-location">
                 <div className="current-location__label">📍 Current Location</div>
                 <p className="current-location__text">{getCurrentLocation()}</p>
               </div>
 
-              {/* Timeline */}
               <div className="delivery-timeline">
                 {selectedOrder.timeline.map((step) => (
-                  <div 
-                    key={step.id} 
+                  <div
+                    key={step.id}
                     className={`timeline-item${step.completed ? " completed" : ""}${step.current ? " current" : ""}`}
                   >
                     <div className="timeline-icon">{step.icon}</div>
@@ -362,7 +395,6 @@ background-attachment: fixed;-deep);
                 ))}
               </div>
 
-              {/* Order Details */}
               <div className="order-details">
                 <div className="detail-item">
                   <span className="detail-label">Order ID</span>
@@ -382,18 +414,19 @@ background-attachment: fixed;-deep);
                 </div>
               </div>
             </div>
+
           ) : searched && !selectedOrder ? (
             <div className="tracking-result">
               <div className="not-found">
                 <div className="not-found__icon">❌</div>
                 <h2 className="not-found__title">Order Not Found</h2>
                 <p className="not-found__text">
-                  We couldn't find an order with ID "{searchId}"<br />
+                  We couldn't find an order with ID "{searchId}".<br />
                   Please check the order ID and try again.
                 </p>
-                <Button 
-                  variant="primary" 
-                  size="md" 
+                <Button
+                  variant="primary"
+                  size="md"
                   onClick={() => {
                     setSearchId("");
                     setSelectedOrder(null);

@@ -1,96 +1,196 @@
-import { useState, useEffect } from "react";
-import Button from "../common/Button";
+import { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Container from "../common/Container";
+import SectionTitle from "../common/SectionTitle";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 
-export default function Hero({ navigate }) {
-  const [vis, setVis] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setVis(true), 80); return () => clearTimeout(t); }, []);
+gsap.registerPlugin(ScrollTrigger);
 
-  const tr= (delay) => ({
-    opacity: vis ? 1 : 0,
-    transform: vis ? "translateY(0)" : "translateY(24px)",
-    transition: `opacity 0.75s var(--ease-out) ${delay}s, transform 0.75s var(--ease-out) ${delay}s`,
-  });
+const CATEGORY_DATA = [
+  { name: "Grains & Rice", emoji: "🌾", count: "12+ Products" },
+  { name: "Flours & Swallows", emoji: "🥄", count: "8+ Products" },
+  { name: "Spices & Seasonings", emoji: "🌶️", count: "15+ Products" },
+  { name: "Dried Foods", emoji: "🫘", count: "10+ Products" },
+];
+
+export default function Categories({ navigate }) {
+  const titleRef = useScrollReveal({ y: 30 });
+  const gridRef = useRef(null);
+
+  useEffect(() => {
+    const cards = gridRef.current.querySelectorAll(".cat-card");
+    gsap.fromTo(
+      cards,
+      { y: 40, opacity: 0, scale: 0.96 },
+      {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 0.8,
+        stagger: 0.12,
+        ease: "power3.out",
+        scrollTrigger: { trigger: gridRef.current, start: "top 85%" },
+      }
+    );
+
+    return () => ScrollTrigger.getAll().forEach((t) => t.kill());
+  }, []);
 
   return (
     <>
       <style>{`
-        .hero {
-          margin-top: 72px; display: grid; grid-template-columns: 1fr 1fr;
-          min-height: calc(100vh - 72px); overflow: hidden;
+        /* ── Section ── */
+        .cat {
+          padding: 80px 0;
+          background: var(--white);
         }
-        .hero__left {
-          background: var(--green); padding: clamp(40px, 6vw, 88px) clamp(28px, 6vw, 80px);
-          display: flex; flex-direction: column; justify-content: center; gap: 28px;
-          position: relative; overflow: hidden;
+
+        .cat__title-section {
+          text-align: center;
+          margin-bottom: 56px;
         }
-        .hero__grain {
-          position: absolute; inset: -50%; width: 200%; height: 200%;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-          animation: grain 8s steps(1) infinite; pointer-events: none;
+
+        /* ── Grid ── */
+        .cat__grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 20px;
         }
-        .hero__tag {
-          font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
-          color: rgba(255,255,255,0.45); font-family: var(--sans);
+
+        @media (max-width: 1100px) {
+          .cat__grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
         }
-        .hero__title {
-          font-family: var(--serif); font-size: clamp(44px, 5.5vw, 82px);
-          font-weight: 300; color: var(--white); line-height: 1.05; margin: 0;
+
+        @media (max-width: 768px) {
+          .cat {
+            padding: 64px 0;
+          }
+
+          .cat__title-section {
+            margin-bottom: 40px;
+          }
+
+          .cat__grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+          }
         }
-        .hero__title em { font-style: italic; color: rgba(255,255,255,0.62); }
-        .hero__para {
-          font-size: 14px; color: rgba(255,255,255,0.58); line-height: 1.9;
-          max-width: 380px; font-weight: 300;
+
+        @media (max-width: 480px) {
+          .cat {
+            padding: 48px 0;
+          }
+
+          .cat__title-section {
+            margin-bottom: 32px;
+          }
+
+          .cat__grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
         }
-        .hero__actions { display: flex; gap: 14px; flex-wrap: wrap; }
-        .hero__stats { display: flex; gap: 36px; margin-top: 8px; }
-        .hero__stat-num {
-          font-family: var(--serif); font-size: 28px; font-weight: 400;
-          color: var(--white); display: block; line-height: 1;
+
+        /* ── Card ── */
+        .cat-card {
+          background: linear-gradient(135deg, var(--beige-deep) 0%, var(--beige-dark) 100%);
+          border-radius: 8px;
+          padding: 32px 24px;
+          text-align: center;
+          cursor: pointer;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          position: relative;
+          overflow: hidden;
+          min-height: 220px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
         }
-        .hero__stat-label {
-          font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-          color: rgba(255,255,255,0.38); margin-top: 4px;
+
+        .cat-card::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+          transform: translateX(-100%);
+          transition: none;
         }
-        .hero__scroll {
-          position: absolute; bottom: 32px; left: clamp(28px,6vw,80px);
-          display: flex; align-items: center; gap: 12px;
+
+        .cat-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 20px 48px rgba(0, 0, 0, 0.12);
         }
-        .hero__scroll-line {
-          width: 40px; height: 1px; background: rgba(255,255,255,0.3);
-          animation: pulse 2.4s ease infinite;
+
+        .cat-card:hover::before {
+          animation: shimmerSlide 0.6s ease forwards;
         }
-        .hero__scroll-text {
-          font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-          color: rgba(255,255,255,0.32);
+
+        /* ── Emoji ── */
+        .cat-card__emoji {
+          font-size: 56px;
+          display: block;
+          transition: transform 0.4s var(--ease-out);
         }
-        .hero__right {
-          background: transparent;
-background-size: cover;
-background-attachment: fixed;-deep); position: relative; overflow: hidden;
-          display: flex; align-items: center; justify-content: center;
+
+        .cat-card:hover .cat-card__emoji {
+          transform: scale(1.2) rotate(-5deg);
         }
-        .hero__img-wrap {
-          width: 72%; aspect-ratio: 3/4; background: transparent;
-background-size: cover;
-background-attachment: fixed;-dark);
-          display: flex; align-items: center; justify-content: center;
-          font-size: 120px; position: relative;
-          animation: fadeIn 1s var(--ease-out) 0.6s both;
+
+        /* ── Name ── */
+        .cat-card__name {
+          font-family: var(--serif);
+          font-size: 18px;
+          font-weight: 400;
+          color: var(--charcoal);
+          margin: 0;
         }
-        .hero__img-caption {
-          position: absolute; bottom: 0; left: 0; right: 0;
-          background: var(--green); color: var(--white);
-          padding: 12px 20px; display: flex; justify-content: space-between;
-          font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+
+        /* ── Count ── */
+        .cat-card__count {
+          font-size: 11px;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          color: var(--muted);
+          margin: 0;
         }
-        @media (max-width: 900px) {
-          .hero { grid-template-columns: 1fr; }
-          .hero__right { display: none; }
-          .hero__left { min-height: 85vh; }
+
+        /* ── Shimmer Animation ── */
+        @keyframes shimmerSlide {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
         }
       `}</style>
 
-      
+      <section className="cat">
+        <Container>
+          <div ref={titleRef} className="cat__title-section">
+            <SectionTitle label="Browse by Category" title="Shop by" italic="Category" />
+          </div>
+
+          <div className="cat__grid" ref={gridRef}>
+            {CATEGORY_DATA.map((cat) => (
+              <div
+                key={cat.name}
+                className="cat-card"
+                onClick={() => navigate("shop")}
+              >
+                <span className="cat-card__emoji">{cat.emoji}</span>
+                <h3 className="cat-card__name">{cat.name}</h3>
+                <p className="cat-card__count">{cat.count}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
     </>
   );
 }

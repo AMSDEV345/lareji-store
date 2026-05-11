@@ -1,263 +1,274 @@
-import { useState, useMemo } from "react";
-import { PRODUCTS, CATEGORIES } from "../data/products";
+import { useState, useEffect } from "react";
 import Container from "../components/common/Container";
-import { useCart } from "../context/CartContext";
+import ProductCard from "../components/common/ProductCard";
+import SectionTitle from "../components/common/SectionTitle";
+import { PRODUCTS } from "../data/products";
 
-const fmt = (n) => `₦${n.toLocaleString()}`;
+export default function Shop({ navigate, addToCart }) {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [filteredProducts, setFilteredProducts] = useState(PRODUCTS);
+  const [sortBy, setSortBy] = useState("featured");
 
-export default function Shop({ navigate }) {
-  const [cat, setCat]     = useState("all");
-  const [search, setSearch] = useState("");
-  const [sort, setSort]   = useState("default");
-  const { addToCart }     = useCart();
-  const [sizes, setSizes] = useState({});
-  const [added, setAdded] = useState({});
+  const categories = ["All", ...new Set(PRODUCTS.map((p) => p.category))];
 
-  const filtered = useMemo(() => {
-    let list = cat === "all" ? PRODUCTS : PRODUCTS.filter((p) => p.category === cat);
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter((p) => p.name.toLowerCase().includes(q) || p.categoryLabel.toLowerCase().includes(q));
+  useEffect(() => {
+    let filtered = PRODUCTS;
+
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter((p) => p.category === selectedCategory);
     }
-    if (sort === "price-asc")  list = [...list].sort((a, b) => a.price - b.price);
-    if (sort === "price-desc") list = [...list].sort((a, b) => b.price - a.price);
-    if (sort === "name")       list = [...list].sort((a, b) => a.name.localeCompare(b.name));
-    return list;
-  }, [cat, search, sort]);
 
-  const getSize = (p) => sizes[p.id] || p.sizes?.[1] || p.sizes?.[0] || "1kg";
+    if (sortBy === "price-low") {
+      filtered = [...filtered].sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price-high") {
+      filtered = [...filtered].sort((a, b) => b.price - a.price);
+    } else if (sortBy === "newest") {
+      filtered = [...filtered].reverse();
+    }
 
-  const handleAdd = (e, p) => {
-    e.stopPropagation();
-    addToCart(p, getSize(p));
-    setAdded((prev) => ({ ...prev, [p.id]: true }));
-    setTimeout(() => setAdded((prev) => ({ ...prev, [p.id]: false })), 1800);
-  };
+    setFilteredProducts(filtered);
+  }, [selectedCategory, sortBy]);
 
   return (
     <>
       <style>{`
-        .shop { padding-top: 72px; }
+        /* ── Page ── */
+        .shop {
+          width: 100%;
+          max-width: 100%;
+          overflow-x: hidden;
+          margin-top: 72px;
+          padding-bottom: 80px;
+        }
+
+        /* ── Hero ── */
         .shop__hero {
-          background: var(--green); padding: clamp(40px,5vw,72px) clamp(20px,6vw,80px);
-          position: relative; overflow: hidden;
+          background: var(--green);
+          color: var(--white);
+          padding: clamp(60px, 10vw, 100px) clamp(28px, 6vw, 80px);
+          text-align: center;
         }
-        .shop__hero-circle {
-          position: absolute; right: -60px; bottom: -80px;
-          width: 320px; height: 320px; border-radius: 50%;
-          background: rgba(255,255,255,0.04); pointer-events: none;
+
+        .shop__hero-title {
+          font-family: var(--serif);
+          font-size: clamp(40px, 5vw, 72px);
+          font-weight: 300;
+          line-height: 1.1;
+          margin-bottom: 12px;
         }
-        .shop__hero-label { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
-        .shop__hero-title { font-family: var(--serif); font-size: clamp(36px,4.5vw,64px); font-weight: 300; color: var(--white); line-height: 1.1; }
-        .shop__hero-title em { font-style: italic; color: rgba(255,255,255,0.62); }
-        .shop__hero-count { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 10px; font-weight: 300; }
-        .shop__bar {
+
+        .shop__hero-sub {
+          font-size: 15px;
+          color: rgba(255,255,255,0.7);
+          max-width: 480px;
+          margin: 0 auto;
+        }
+
+        /* ── Controls ── */
+        .shop__controls {
           background: var(--white);
-          padding: 18px clamp(20px,6vw,80px);
+          padding: 24px clamp(16px, 6vw, 80px);
+          border-bottom: 1px solid var(--beige-dark);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 16px;
+        }
+
+        .shop__filters {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .filter-btn {
+          padding: 8px 16px;
+          background: var(--white);
+          border: 1px solid var(--beige-dark);
+          font-size: 12px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.2s;
+          border-radius: 4px;
+          font-family: var(--sans);
+        }
+
+        .filter-btn:hover { border-color: var(--green); }
+
+        .filter-btn.active {
+          background: var(--green);
+          color: var(--white);
+          border-color: var(--green);
+        }
+
+        .shop__sort {
           display: flex;
           align-items: center;
-          gap: 14px;
-          flex-wrap: wrap;
-          border-bottom: 1px solid var(--beige-dark);
-          position: sticky;
-          top: 72px;
-          z-index: 50;
+          gap: 8px;
         }
-        .shop__search {
-          flex: 1; min-width: 180px; padding: 10px 16px;
-          border: 1px solid var(--beige-dark); background: var(--white);
-          font-family: var(--sans); font-size: 13px; color: var(--charcoal); outline: none;
-          transition: border-color 0.2s;
+
+        .shop__sort-label {
+          font-size: 12px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          color: var(--muted);
         }
-        .shop__search:focus { border-color: var(--green); }
-        .shop__sort {
-          padding: 10px 14px; border: 1px solid var(--beige-dark); background: var(--white);
-          font-family: var(--sans); font-size: 12px; color: var(--charcoal); outline: none; cursor: pointer;
-        }
-        .shop__count { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-left: auto; }
-        .shop__body  { display: grid; grid-template-columns: 220px 1fr; min-height: 70vh; }
-        .shop__side  {
-          background: var(--white);
-          padding: 32px 24px;
-          border-right: 1px solid var(--beige-dark);
-          position: sticky;
-          top: 125px;
-          align-self: start;
-          max-height: calc(100vh - 125px);
-          overflow-y: auto;
-        }
-        .shop__side-head { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
-        .shop__cat-list  { display: flex; flex-direction: column; gap: 2px; }
-        .shop__cat {
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 10px 12px; background: none; border: none; cursor: pointer;
-          font-family: var(--sans); font-size: 13px; color: var(--charcoal);
-          text-align: left; transition: background 0.15s; border-radius: 2px;
-        }
-        .shop__cat:hover { background: rgba(30,75,50,0.04); }
-        .shop__cat.active { background: rgba(30,75,50,0.08); color: var(--green); font-weight: 500; }
-        .shop__cat-badge { font-size: 10px; color: var(--muted); background: transparent; padding: 2px 7px; border-radius: 10px; }
-        .shop__cat.active .shop__cat-badge { background: rgba(30,75,50,0.14); color: var(--green); }
-        .shop__main   { padding: 32px clamp(16px,3vw,40px) 72px; }
-        .shop__grid   { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-        .shop__empty  {
-          grid-column: 1 / -1; padding: 80px 0; display: flex;
-          flex-direction: column; align-items: center; gap: 12px; text-align: center;
-        }
-        .shop__empty-emoji { font-size: 48px; opacity: 0.3; }
-        .shop__empty-text  { font-family: var(--serif); font-size: 22px; color: var(--muted); }
-        .shop__empty-sub   { font-size: 13px; color: var(--muted); }
-        .shop__empty-btn {
-          margin-top: 8px; background: var(--green); color: var(--white); border: none;
-          padding: 12px 28px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-          font-family: var(--sans); cursor: pointer;
-        }
-        .spc {
-          background: var(--white); cursor: pointer; overflow: hidden;
-          transition: box-shadow 0.3s, transform 0.3s;
-          animation: fadeUp 0.55s var(--ease-out) both;
+
+        .shop__sort-select {
+          padding: 8px 12px;
           border: 1px solid var(--beige-dark);
+          background: var(--white);
+          font-family: var(--sans);
+          font-size: 12px;
+          cursor: pointer;
           border-radius: 4px;
         }
-        .spc:hover { box-shadow: 0 10px 40px rgba(0,0,0,0.09); transform: translateY(-3px); }
-        .spc__img {
-          width: 100%; aspect-ratio: 1; background: var(--white);
-          display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
+
+        /* ── Grid ── */
+        .shop__body {
+          width: 100%;
+          max-width: 100%;
+          overflow-x: hidden;
         }
-        .spc__emoji { font-size: 56px; transition: transform 0.4s var(--ease-out); }
-        .spc:hover .spc__emoji { transform: scale(1.12); }
-        .spc__badge {
-          position: absolute; top: 10px; left: 10px; background: var(--green); color: var(--white);
-          font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 9px;
+
+        .shop__main {
+          width: 100%;
+          max-width: 100%;
+          overflow-x: hidden;
+          background: transparent;
+          padding: clamp(40px, 6vw, 60px) clamp(16px, 4vw, 40px) 0;
         }
-        .spc__badge.new     { background: var(--charcoal); }
-        .spc__badge.popular { background: #b5540a; }
-        .spc__body  { padding: 16px 18px 20px; }
-        .spc__cat   { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
-        .spc__name  { font-family: var(--serif); font-size: 18px; font-weight: 400; margin-bottom: 11px; line-height: 1.2; }
-        .spc__sizes { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
-        .spc__sz {
-          font-size: 10px; padding: 3px 9px; border: 1px solid var(--beige-dark);
-          background: none; cursor: pointer; color: var(--muted); transition: all 0.15s; font-family: var(--sans);
+
+        .shop__grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 16px;
+          width: 100%;
         }
-        .spc__sz.active { border-color: var(--green); color: var(--green); background: rgba(30,75,50,0.06); }
-        .spc__foot  { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-        .spc__price { font-size: 16px; font-weight: 500; color: var(--green); }
-        .spc__old   { font-size: 11px; color: var(--muted); text-decoration: line-through; margin-left: 5px; }
-        .spc__add {
-          background: var(--green); color: var(--white); border: none;
-          padding: 8px 14px; font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-          font-family: var(--sans); cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+
+        @media (min-width: 768px) {
+          .shop__grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+          }
         }
-        .spc__add:hover { background: var(--green-mid); }
-        .spc__add.done  { background: #2d7a50; }
-        @media (max-width: 1024px) {
-          .shop__body { grid-template-columns: 1fr; }
-          .shop__side { display: none; }
-          .shop__grid { grid-template-columns: repeat(2, 1fr); }
+
+        @media (min-width: 1200px) {
+          .shop__grid {
+            grid-template-columns: repeat(5, 1fr);
+            gap: 24px;
+          }
         }
-        @media (max-width: 480px) {
-          .shop__grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* ── Empty State ── */
+        .shop__empty {
+          text-align: center;
+          padding: 80px 24px;
+        }
+
+        .shop__empty-icon {
+          font-size: 56px;
+          margin-bottom: 16px;
+          display: block;
+        }
+
+        .shop__empty-title {
+          font-family: var(--serif);
+          font-size: 26px;
+          margin: 0 0 8px 0;
+        }
+
+        .shop__empty-text {
+          color: var(--muted);
+          margin: 0;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+          .shop__controls {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .shop__filters { justify-content: center; }
+          .shop__sort { justify-content: center; }
+
+          .shop__grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 0 12px;
+          }
         }
       `}</style>
 
       <div className="shop">
+        {/* Hero */}
         <div className="shop__hero">
-          <div className="shop__hero-circle" />
-          <p className="shop__hero-label">Premium African Ingredients</p>
-          <h1 className="shop__hero-title">The <em>LAREJI</em><br />STORE</h1>
-          <p className="shop__hero-count">{PRODUCTS.length} Products Available</p>
+          <h1 className="shop__hero-title">Shop LAREJI</h1>
+          <p className="shop__hero-sub">
+            Authentic African ingredients, carefully sourced and beautifully
+            packaged
+          </p>
         </div>
 
-        <div className="shop__bar">
-          <input
-            className="shop__search"
-            type="text"
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <select className="shop__sort" value={sort} onChange={(e) => setSort(e.target.value)}>
-            <option value="default">Sort: Default</option>
-            <option value="price-asc">Price: Low → High</option>
-            <option value="price-desc">Price: High → Low</option>
-            <option value="name">Name: A–Z</option>
-          </select>
-          <span className="shop__count">{filtered.length} RESULTS</span>
-        </div>
-
-        <div className="shop__body">
-          <aside className="shop__side">
-            <p className="shop__side-head">Categories</p>
-            <div className="shop__cat-list">
-              <button className={`shop__cat${cat === "all" ? " active" : ""}`} onClick={() => setCat("all")}>
-                All Products <span className="shop__cat-badge">{PRODUCTS.length}</span>
+        {/* Controls */}
+        <div className="shop__controls">
+          <div className="shop__filters">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                className={`filter-btn${selectedCategory === cat ? " active" : ""}`}
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {cat}
               </button>
-              {CATEGORIES.map((c) => (
-                <button key={c.id} className={`shop__cat${cat === c.id ? " active" : ""}`} onClick={() => setCat(c.id)}>
-                  {c.emoji} {c.label} <span className="shop__cat-badge">{c.count}</span>
-                </button>
-              ))}
-            </div>
-          </aside>
+            ))}
+          </div>
+          <div className="shop__sort">
+            <label className="shop__sort-label">Sort:</label>
+            <select
+              className="shop__sort-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="featured">Featured</option>
+              <option value="newest">Newest</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+            </select>
+          </div>
+        </div>
 
-          <div className="shop__main">
-            <div className="shop__grid">
-              {filtered.length === 0 ? (
-                <div className="shop__empty">
-                  <div className="shop__empty-emoji">🔍</div>
-                  <p className="shop__empty-text">No products found</p>
-                  <p className="shop__empty-sub">Try a different search or category</p>
-                  <button className="shop__empty-btn" onClick={() => { setSearch(""); setCat("all"); }}>
-                    Clear Filters
-                  </button>
+        {/* Grid */}
+        <div className="shop__body">
+          <Container>
+            <div className="shop__main">
+              {filteredProducts.length > 0 ? (
+                <div className="shop__grid">
+                  {filteredProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onAddToCart={() => addToCart(product)}
+                      onViewDetails={() => navigate(`product/${product.id}`)}
+                    />
+                  ))}
                 </div>
               ) : (
-                filtered.map((p, i) => (
-                  <div
-                    key={p.id}
-                    className="spc"
-                    style={{ animationDelay: `${i * 0.04}s` }}
-                    onClick={() => navigate("product", p)}
-                  >
-                    <div className="spc__img">
-                      <span className="spc__emoji">{p.emoji}</span>
-                      {p.badge && <span className={`spc__badge ${p.badge.toLowerCase()}`}>{p.badge}</span>}
-                    </div>
-                    <div className="spc__body">
-                      <p className="spc__cat">{p.categoryLabel}</p>
-                      <h3 className="spc__name">{p.name}</h3>
-                      <div className="spc__sizes" onClick={(e) => e.stopPropagation()}>
-                        {p.sizes?.map((s) => (
-                          <button
-                            key={s}
-                            className={`spc__sz${getSize(p) === s ? " active" : ""}`}
-                            onClick={() => setSizes((prev) => ({ ...prev, [p.id]: s }))}
-                          >
-                            {s}
-                          </button>
-                        ))}
-                      </div>
-                      <div className="spc__foot">
-                        <span>
-                          <span className="spc__price">{fmt(p.price)}</span>
-                          {p.oldPrice && <span className="spc__old">{fmt(p.oldPrice)}</span>}
-                        </span>
-                        <button
-                          className={`spc__add${added[p.id] ? " done" : ""}`}
-                          onClick={(e) => handleAdd(e, p)}
-                        >
-                          {added[p.id] ? "✓" : "+ Add"}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))
+                <div className="shop__empty">
+                  <span className="shop__empty-icon">🔍</span>
+                  <h2 className="shop__empty-title">No Products Found</h2>
+                  <p className="shop__empty-text">
+                    Try a different category or check back soon
+                  </p>
+                </div>
               )}
             </div>
-          </div>
+          </Container>
         </div>
       </div>
     </>
   );
-} 
+}
