@@ -123,6 +123,7 @@ export default function FeaturedProducts({ navigate }) {
           transform-style: preserve-3d;
           display: flex;
           flex-direction: column;
+          height: 100%;
         }
 
         .pc:hover {
@@ -139,6 +140,7 @@ export default function FeaturedProducts({ navigate }) {
           justify-content: center;
           position: relative;
           overflow: hidden;
+          flex-shrink: 0;
         }
 
         .pc__emoji {
@@ -216,7 +218,8 @@ export default function FeaturedProducts({ navigate }) {
           padding: 18px 20px 22px;
           display: flex;
           flex-direction: column;
-          flex: 1;
+          flex-grow: 1;
+          gap: 8px;
         }
 
         .pc__cat {
@@ -224,14 +227,14 @@ export default function FeaturedProducts({ navigate }) {
           letter-spacing: 3px;
           text-transform: uppercase;
           color: var(--muted);
-          margin-bottom: 6px;
+          margin: 0;
         }
 
         .pc__name {
           font-family: var(--serif);
           font-size: 19px;
           font-weight: 400;
-          margin-bottom: 12px;
+          margin: 0;
           line-height: 1.2;
         }
 
@@ -240,7 +243,7 @@ export default function FeaturedProducts({ navigate }) {
           display: flex;
           gap: 6px;
           flex-wrap: wrap;
-          margin-bottom: 14px;
+          margin: 8px 0 0 0;
         }
 
         .pc__size {
@@ -270,12 +273,17 @@ export default function FeaturedProducts({ navigate }) {
         /* ── Footer ── */
         .pc__foot {
           display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 8px;
+          flex-direction: column;
+          gap: 12px;
           margin-top: auto;
           padding-top: 14px;
           border-top: 1px solid var(--beige-dark);
+        }
+
+        .pc__price-wrap {
+          display: flex;
+          align-items: baseline;
+          gap: 6px;
         }
 
         .pc__price {
@@ -288,7 +296,6 @@ export default function FeaturedProducts({ navigate }) {
           font-size: 12px;
           color: var(--muted);
           text-decoration: line-through;
-          margin-left: 6px;
         }
 
         /* ── Add Button ── */
@@ -296,17 +303,19 @@ export default function FeaturedProducts({ navigate }) {
           background: var(--green);
           color: var(--white);
           border: none;
-          padding: 9px 16px;
+          padding: 10px 16px;
           font-size: 10px;
           letter-spacing: 2px;
           text-transform: uppercase;
           font-family: var(--sans);
+          font-weight: 500;
           cursor: pointer;
           transition: background 0.2s;
           white-space: nowrap;
-          flex-shrink: 0;
           will-change: transform;
           border-radius: 2px;
+          width: 100%;
+          text-align: center;
         }
 
         .pc__add:hover {
@@ -384,7 +393,6 @@ function ProductCard({ product, onView }) {
   const [added, setAdded] = useState(false);
   const cardRef = useRef(null);
 
-  // Magnetic hover effect
   useEffect(() => {
     const card = cardRef.current;
     if (!card) return;
@@ -426,7 +434,6 @@ function ProductCard({ product, onView }) {
     addToCart(product, size);
     setAdded(true);
 
-    // Bounce animation on add
     gsap.fromTo(
       e.currentTarget,
       { scale: 0.88 },
@@ -469,12 +476,12 @@ function ProductCard({ product, onView }) {
         </div>
 
         <div className="pc__foot">
-          <span>
+          <div className="pc__price-wrap">
             <span className="pc__price">{fmt(product.price)}</span>
             {product.oldPrice && (
               <span className="pc__old">{fmt(product.oldPrice)}</span>
             )}
-          </span>
+          </div>
           <button
             className={`pc__add${added ? " added" : ""}`}
             onClick={handleAdd}
