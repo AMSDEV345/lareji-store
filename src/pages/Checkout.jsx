@@ -19,31 +19,33 @@ export default function Checkout({ navigate }) {
 
   // Load Flutterwave script on mount
   useEffect(() => {
-    // Check if script already exists
-    if (document.querySelector('script[src="https://checkout.flutterwave.com/v3.js"]')) {
-      setScriptLoaded(true);
-      return;
-    }
+    const loadFlutterwave = () => {
+      // Check if already loaded
+      if (window.FlutterWaveCheckout) {
+        console.log("✅ Flutterwave already loaded");
+        setScriptLoaded(true);
+        return;
+      }
 
-    const script = document.createElement("script");
-    script.src = "https://checkout.flutterwave.com/v3.js";
-    script.async = true;
-    
-    script.onload = () => {
-      console.log("✅ Flutterwave script loaded");
-      setScriptLoaded(true);
+      const script = document.createElement("script");
+      script.src = "https://checkout.flutterwave.com/v3.js";
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      
+      script.onload = () => {
+        console.log("✅ Flutterwave script loaded successfully");
+        setScriptLoaded(true);
+      };
+      
+      script.onerror = () => {
+        console.error("❌ Failed to load Flutterwave script");
+        setError("Payment service unavailable. Please try refreshing the page.");
+      };
+      
+      document.head.appendChild(script);
     };
-    
-    script.onerror = () => {
-      console.error("❌ Failed to load Flutterwave script");
-      setError("Payment service unavailable. Please try again.");
-    };
-    
-    document.body.appendChild(script);
-    
-    return () => {
-      // Don't remove the script on unmount - it's needed for payment
-    };
+
+    loadFlutterwave();
   }, []);
 
   const handleInputChange = (e) => {
@@ -75,13 +77,8 @@ export default function Checkout({ navigate }) {
   const handlePayment = () => {
     if (!validateForm()) return;
 
-    if (!scriptLoaded) {
-      setError("Flutterwave is still loading. Please wait a moment and try again.");
-      return;
-    }
-
-    if (!window.FlutterWaveCheckout) {
-      setError("Payment service not ready. Please refresh and try again.");
+    if (!scriptLoaded || !window.FlutterWaveCheckout) {
+      setError("Payment service is loading. Please wait a moment and try again.");
       return;
     }
 
@@ -109,7 +106,7 @@ export default function Checkout({ navigate }) {
           logo: "https://lareji.co/logo.png",
         },
         callback: function (data) {
-          console.log("Payment callback response:", data);
+          console.log("Payment response:", data);
           setLoading(false);
 
           if (data.status === "successful") {
@@ -124,7 +121,7 @@ export default function Checkout({ navigate }) {
           }
         },
         onclose: function () {
-          console.log("User closed payment modal");
+          console.log("Payment modal closed");
           setLoading(false);
         },
       });
@@ -346,6 +343,16 @@ export default function Checkout({ navigate }) {
           color: var(--green);
         }
 
+        .checkout__loading {
+          background: rgba(51, 130, 100, 0.08);
+          border: 1px solid var(--green);
+          padding: 12px 16px;
+          border-radius: 2px;
+          color: var(--green);
+          font-size: 13px;
+          animation: slideDown 0.3s ease-out;
+        }
+
         @media (max-width: 768px) {
           .checkout__body {
             grid-template-columns: 1fr;
@@ -368,6 +375,7 @@ export default function Checkout({ navigate }) {
             {/* Form */}
             <form className="checkout__form" onSubmit={(e) => e.preventDefault()}>
               {error && <div className="checkout__error">❌ {error}</div>}
+              {!scriptLoaded && <div className="checkout__loading">⏳ Loading payment service...</div>}
 
               <div>
                 <h3 className="checkout__form-section-title">Delivery Information</h3>
@@ -433,7 +441,7 @@ export default function Checkout({ navigate }) {
                 onClick={handlePayment}
                 disabled={loading || !scriptLoaded}
               >
-                {!scriptLoaded ? "Loading..." : loading ? "Processing..." : `Pay ₦${cartTotal.toLocaleString()}`}
+                {!scriptLoaded ? "Loading payment..." : loading ? "Processing..." : `Pay ₦${cartTotal.toLocaleString()}`}
               </Button>
 
               <p style={{ textAlign: "center", fontSize: "12px", color: "var(--muted)" }}>
