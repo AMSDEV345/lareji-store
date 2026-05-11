@@ -406,7 +406,7 @@ export default function Checkout({ navigate }) {
                     <input
                       name="phone"
                       required
-                      placeholder="+234 9161244319"
+                      placeholder="+234 91000000000"
                       value={form.phone}
                       onChange={handleChange}
                     />

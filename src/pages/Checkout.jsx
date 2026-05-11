@@ -15,18 +15,34 @@ export default function Checkout({ navigate }) {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [scriptLoaded, setScriptLoaded] = useState(false);
 
   // Load Flutterwave script on mount
   useEffect(() => {
+    // Check if script already exists
+    if (document.querySelector('script[src="https://checkout.flutterwave.com/v3.js"]')) {
+      setScriptLoaded(true);
+      return;
+    }
+
     const script = document.createElement("script");
     script.src = "https://checkout.flutterwave.com/v3.js";
     script.async = true;
-    script.onload = () => console.log("Flutterwave script loaded");
-    script.onerror = () => console.error("Failed to load Flutterwave script");
+    
+    script.onload = () => {
+      console.log("✅ Flutterwave script loaded");
+      setScriptLoaded(true);
+    };
+    
+    script.onerror = () => {
+      console.error("❌ Failed to load Flutterwave script");
+      setError("Payment service unavailable. Please try again.");
+    };
+    
     document.body.appendChild(script);
     
     return () => {
-      document.body.removeChild(script);
+      // Don't remove the script on unmount - it's needed for payment
     };
   }, []);
 
@@ -59,8 +75,13 @@ export default function Checkout({ navigate }) {
   const handlePayment = () => {
     if (!validateForm()) return;
 
-    if (!window.FlutterWaveCheckout) {
+    if (!scriptLoaded) {
       setError("Flutterwave is still loading. Please wait a moment and try again.");
+      return;
+    }
+
+    if (!window.FlutterWaveCheckout) {
+      setError("Payment service not ready. Please refresh and try again.");
       return;
     }
 
@@ -94,9 +115,12 @@ export default function Checkout({ navigate }) {
           if (data.status === "successful") {
             alert("✅ Payment successful! Your order is being processed.");
             clearCart();
+            localStorage.removeItem("lareji_cart");
             setTimeout(() => navigate("shop"), 2000);
+          } else if (data.status === "cancelled") {
+            setError("Payment was cancelled. Please try again.");
           } else {
-            setError("Payment was not completed. Please try again.");
+            setError("Payment failed. Please try again.");
           }
         },
         onclose: function () {
@@ -407,9 +431,9 @@ export default function Checkout({ navigate }) {
                 size="lg"
                 fullWidth
                 onClick={handlePayment}
-                disabled={loading}
+                disabled={loading || !scriptLoaded}
               >
-                {loading ? "Processing..." : `Pay ₦${cartTotal.toLocaleString()}`}
+                {!scriptLoaded ? "Loading..." : loading ? "Processing..." : `Pay ₦${cartTotal.toLocaleString()}`}
               </Button>
 
               <p style={{ textAlign: "center", fontSize: "12px", color: "var(--muted)" }}>
