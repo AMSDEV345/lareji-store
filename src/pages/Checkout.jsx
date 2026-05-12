@@ -70,9 +70,9 @@ export default function Checkout({ navigate }) {
           phone: form.phone,
           address: form.address,
           amount: cartTotal,
-          tx_ref: txRef,
+          tx_ref: txRef,  
         }),
-      });
+      }); 
 
       console.log("Response status:", response.status);
       const data = await response.json();

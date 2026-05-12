@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useCart } from "../../context/CartContext";
+import { useAdmin } from "../../context/AdminContext";
 
 const LINKS = ["Home", "Shop", "About", "Contact", "Track"];
 
 export default function Navbar({ page, navigate }) {
   const { cartCount, openDrawer } = useCart();
+  const { isAdmin } = useAdmin();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [bump, setBump] = useState(false);
@@ -48,6 +50,14 @@ export default function Navbar({ page, navigate }) {
   const handleCartClick = () => {
     openDrawer();
     setMenuOpen(false);
+  };
+
+  const handleAdminClick = () => {
+    if (isAdmin) {
+      handleNavigation("admin");
+    } else {
+      handleNavigation("admin-login");
+    }
   };
 
   return (
@@ -352,6 +362,30 @@ export default function Navbar({ page, navigate }) {
         }
 
         /* ============================================
+           ADMIN LINK
+           ============================================ */
+        .nav__dropdown-admin {
+          padding: 14px 20px;
+          font-size: 11px;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          color: var(--charcoal);
+          background: none;
+          border: none;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+          cursor: pointer;
+          text-align: left;
+          font-family: var(--sans);
+          font-weight: 600;
+          transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .nav__dropdown-admin:hover {
+          background: rgba(30, 75, 50, 0.04);
+          color: var(--green);
+        }
+
+        /* ============================================
            RESPONSIVE DESIGN
            ============================================ */
         @media (max-width: 768px) {
@@ -425,10 +459,16 @@ export default function Navbar({ page, navigate }) {
             {link}
           </button>
         ))}
+        <button 
+          className="nav__dropdown-admin"
+          onClick={handleAdminClick}
+        >
+          {isAdmin ? "Admin" : "Admin Login"}
+        </button>
         <button className="nav__dropdown-cart" onClick={handleCartClick}>
           Cart ({cartCount})
         </button>
       </div>
     </>
   );
-} 
+}
