@@ -61,7 +61,7 @@ export default function Checkout({ navigate }) {
         tx_ref: txRef,
       });
 
-      const response = await fetch("https://lareji-store-backend.vercel.app/api/payments/initialize", {x
+      const response = await fetch("https://lareji-store-backend.vercel.app/api/payments/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -443,4 +443,4 @@ export default function Checkout({ navigate }) {
       </div>
     </>
   );
-} 
+}
