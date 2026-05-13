@@ -142,10 +142,8 @@ background-attachment: fixed;-deep);
           </form>
 
           <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 24, textAlign: "center" }}>
-            Default credentials:<br />
-            Username: <strong>admin</strong><br />
-            Password: <strong>lareji2024</strong>
-          </p>
+  Contact your administrator for access credentials
+</p>
         </div>
       </div>
     </>
